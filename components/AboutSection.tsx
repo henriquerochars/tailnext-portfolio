@@ -1,19 +1,29 @@
-import React from "react"
-import Image from "next/image"
+import React from "react";
+import Image from "next/image";
 
 const skills = [
-  { skill: "HTML" },
-  { skill: "CSS" },
-  { skill: "JavaScript" },
-  { skill: "TypeScript" },
-  { skill: "Python" },
-  { skill: "React" },
-  { skill: "Next.js" },
-  { skill: "Tailwind CSS" },
-  { skill: "Git" },
-  { skill: "GitHub" },
-  { skill: "Jupyter Notebooks" },
-]
+  { skill: "HTML", color: 'blue' },
+  { skill: "CSS", color: 'blue' },
+  { skill: "SCSS", color: 'blue' },
+  { skill: "LESS", color: 'blue' },
+  { skill: "Tailwind CSS", color: 'blue' },
+  { skill: "Styled Components", color: 'blue' },
+  { skill: "JavaScript", color: 'yellow' },
+  { skill: "TypeScript", color: 'yellow' },
+  { skill: "Node.js", color: 'orange' },
+  { skill: "React", color: 'orange' },
+  { skill: "React Native", color: 'orange' },
+  { skill: "Next.js", color: 'orange' },
+  { skill: "Git", color: 'purple' },
+  { skill: "GitHub", color: 'purple' },
+  { skill: "Storybook", color: 'purple' },
+  { skill: "CI/CD", color: 'purple' },
+  { skill: "AWS", color: 'purple' },
+  { skill: "Unit Tests", color: 'pink' },
+  { skill: "Jest", color: 'pink' },
+  { skill: "Enzyme", color: 'pink' },
+  { skill: "Mocha", color: 'pink' },
+];
 
 const AboutSection = () => {
   return (
@@ -30,22 +40,22 @@ const AboutSection = () => {
               Get to know me!
             </h1>
             <p>
-              Hi, my name is Hosna and I am a{" "}
+              Hi, my name is Henrique and I am a{" "}
               <span className="font-bold">{"highly ambitious"}</span>,
               <span className="font-bold">{" self-motivated"}</span>, and
               <span className="font-bold">{" driven"}</span> software engineer
-              based in Los Angeles, CA.
+              based in Rio de Janeiro, Brazil.
             </p>
             <br />
             <p>
-              I graduated from California State University, Northridge in 2019
-              with a BS in Computer Engineering and have been working in the
-              field ever since.
+              I started working in the IT area in 2017, shortly after falling in
+              love with programming in 2016 while studying economics at the
+              Federal University of Espírito Santo (UFES).
             </p>
             <br />
             <p>
               I have a wide range of hobbies and passions that keep me busy.
-              From reading, playing sports, traveling, to making YouTube videos,
+              From reading, playing sports, traveling,
               I am always seeking new experiences and love to keep myself
               engaged and learning new things.
             </p>
@@ -68,15 +78,15 @@ const AboutSection = () => {
                 return (
                   <p
                     key={idx}
-                    className="bg-gray-200 px-4 py-2 mr-2 mt-2 text-gray-500 rounded font-semibold"
+                    className={`bg-gray-200 px-4 py-2 mr-2 mt-2 text-${item.color}-500 rounded font-semibold`}
                   >
                     {item.skill}
                   </p>
-                )
+                );
               })}
             </div>
             <Image
-              src="/hero-image.png"
+              src="/developer-hero.png"
               alt=""
               width={325}
               height={325}
@@ -86,7 +96,7 @@ const AboutSection = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default AboutSection
+export default AboutSection;

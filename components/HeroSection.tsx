@@ -1,8 +1,10 @@
-"use client" // this is a client component
-import React from "react"
-import Image from "next/image"
-import { Link } from "react-scroll/modules"
-import { HiArrowDown } from "react-icons/hi"
+"use client"; // this is a client component
+import React from "react";
+import Image from "next/image";
+import { Link } from "react-scroll/modules";
+import { HiArrowDown } from "react-icons/hi";
+
+const LinkFixed = Link as unknown as React.FC<any>;
 
 const HeroSection = () => {
   return (
@@ -18,18 +20,19 @@ const HeroSection = () => {
           />
         </div>
         <div className="md:mt-2 md:w-3/5">
-          <h1 className="text-4xl font-bold mt-6 md:mt-0 md:text-7xl">Hi, I&#39;m Henrique!</h1>
+          <h1 className="text-4xl font-bold mt-6 md:mt-0 md:text-7xl">
+            Hi, I&#39;m Henrique!
+          </h1>
           <p className="text-lg mt-4 mb-6 md:text-2xl">
             I&#39;m a{" "}
             <span className="font-semibold text-teal-600">
               Software Engineer{" "}
             </span>
-            based in Rio de Janeiro, Brazil. Working towards creating software that
-            makes life easier and more meaningful.
+            based in Rio de Janeiro, Brazil. Working towards creating software
+            that makes life easier and more meaningful.
           </p>
-          {/* 
-          TODO change the Project section after organize my projects in my github
-          <Link
+
+          {/* <LinkFixed
             to="projects"
             className="text-neutral-100 font-semibold px-6 py-3 bg-teal-600 rounded shadow hover:bg-teal-700"
             activeClass="active"
@@ -39,11 +42,11 @@ const HeroSection = () => {
             duration={500}
           >
             Projects
-          </Link> */}
+          </LinkFixed> */}
         </div>
       </div>
-      {/* <div className="cursor-pointer flex flex-row items-center text-center justify-center ">
-        <Link
+      <div className="cursor-pointer flex flex-row items-center text-center justify-center ">
+        <LinkFixed
           to="about"
           activeClass="active"
           spy={true}
@@ -52,10 +55,10 @@ const HeroSection = () => {
           duration={500}
         >
           <HiArrowDown size={35} className="animate-bounce" />
-        </Link>
-      </div> */}
+        </LinkFixed>
+      </div>
     </section>
-  )
-}
+  );
+};
 
-export default HeroSection
+export default HeroSection;

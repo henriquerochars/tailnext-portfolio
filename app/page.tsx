@@ -9,6 +9,7 @@ export default function Home() {
       {/* 
       TODO change all Project section - after
       <ProjectsSection /> */}
+      {/* <ProjectsSection />  */}
     </main>
   )
 }

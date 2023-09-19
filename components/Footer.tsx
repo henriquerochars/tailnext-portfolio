@@ -33,11 +33,21 @@ const Footer = () => {
           </a> */}
 
           <a
-            href="https://www.linkedin.com/in/henrique-rocha-serrano-73b81813b/"
+            href="https://www.linkedin.com/in/henriquerochaserrano/"
             rel="noreferrer"
             target="_blank"
           >
             <AiOutlineLinkedin
+              className="hover:-translate-y-1 transition-transform cursor-pointer text-neutral-500 dark:text-neutral-100"
+              size={30}
+            />
+          </a>
+          <a
+            href="https://twitter.com/henriquerochars"
+            rel="noreferrer"
+            target="_blank"
+          >
+            <AiOutlineTwitter
               className="hover:-translate-y-1 transition-transform cursor-pointer text-neutral-500 dark:text-neutral-100"
               size={30}
             />

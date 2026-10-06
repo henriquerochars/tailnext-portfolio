@@ -1,4 +1,5 @@
 name: Cleanup validation
+# Temporary validation workflow for issue #7
 
 on:
   push:

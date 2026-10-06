@@ -1,29 +1,28 @@
-import React from "react";
 import Image from "next/image";
 
 const skills = [
-  { skill: "HTML", color: 'blue' },
-  { skill: "CSS", color: 'blue' },
-  { skill: "SCSS", color: 'blue' },
-  { skill: "LESS", color: 'blue' },
-  { skill: "Tailwind CSS", color: 'blue' },
-  { skill: "Styled Components", color: 'blue' },
-  { skill: "JavaScript", color: 'yellow' },
-  { skill: "TypeScript", color: 'yellow' },
-  { skill: "Node.js", color: 'orange' },
-  { skill: "React", color: 'orange' },
-  { skill: "React Native", color: 'orange' },
-  { skill: "Next.js", color: 'orange' },
-  { skill: "Git", color: 'purple' },
-  { skill: "GitHub", color: 'purple' },
-  { skill: "Storybook", color: 'purple' },
-  { skill: "CI/CD", color: 'purple' },
-  { skill: "AWS", color: 'purple' },
-  { skill: "Unit Tests", color: 'pink' },
-  { skill: "Jest", color: 'pink' },
-  { skill: "Enzyme", color: 'pink' },
-  { skill: "Mocha", color: 'pink' },
-];
+  { skill: "HTML", colorClass: "text-blue-500" },
+  { skill: "CSS", colorClass: "text-blue-500" },
+  { skill: "SCSS", colorClass: "text-blue-500" },
+  { skill: "LESS", colorClass: "text-blue-500" },
+  { skill: "Tailwind CSS", colorClass: "text-blue-500" },
+  { skill: "Styled Components", colorClass: "text-blue-500" },
+  { skill: "JavaScript", colorClass: "text-yellow-500" },
+  { skill: "TypeScript", colorClass: "text-yellow-500" },
+  { skill: "Node.js", colorClass: "text-orange-500" },
+  { skill: "React", colorClass: "text-orange-500" },
+  { skill: "React Native", colorClass: "text-orange-500" },
+  { skill: "Next.js", colorClass: "text-orange-500" },
+  { skill: "Git", colorClass: "text-purple-500" },
+  { skill: "GitHub", colorClass: "text-purple-500" },
+  { skill: "Storybook", colorClass: "text-purple-500" },
+  { skill: "CI/CD", colorClass: "text-purple-500" },
+  { skill: "AWS", colorClass: "text-purple-500" },
+  { skill: "Unit Tests", colorClass: "text-pink-500" },
+  { skill: "Jest", colorClass: "text-pink-500" },
+  { skill: "Enzyme", colorClass: "text-pink-500" },
+  { skill: "Mocha", colorClass: "text-pink-500" },
+]
 
 const AboutSection = () => {
   return (
@@ -78,7 +77,7 @@ const AboutSection = () => {
                 return (
                   <p
                     key={idx}
-                    className={`bg-gray-400 px-4 py-2 mr-2 mt-2 text-${item.color}-500 rounded font-semibold`}
+                    className={`bg-gray-400 px-4 py-2 mr-2 mt-2 ${item.colorClass} rounded font-semibold`}
                   >
                     {item.skill}
                   </p>

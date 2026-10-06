@@ -1,10 +1,7 @@
-import React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import SlideUp from "./SlideUp"
 import { BsGithub, BsArrowUpRightSquare } from "react-icons/bs"
-
-const LinkFixed = Link as unknown as React.FC<any>;
 
 const projects = [
   {
@@ -47,7 +44,7 @@ const ProjectsSection = () => {
               <SlideUp offset="-300px 0px -300px 0px">
                 <div className="flex flex-col  animate-slideUpCubiBezier animation-delay-2 md:flex-row md:space-x-12">
                   <div className=" md:w-1/2">
-                    <LinkFixed href={project.link}>
+                    <Link href={project.link}>
                       <Image
                         src={project.image}
                         alt=""
@@ -55,7 +52,7 @@ const ProjectsSection = () => {
                         height={1000}
                         className="rounded-xl shadow-xl hover:opacity-70"
                       />
-                    </LinkFixed>
+                    </Link>
                   </div>
                   <div className="mt-8 md:w-1/2">
                     <h1 className="text-4xl font-bold mb-6">{project.name}</h1>
@@ -63,18 +60,18 @@ const ProjectsSection = () => {
                       {project.description}
                     </p>
                     <div className="flex flex-row align-bottom space-x-4">
-                      <LinkFixed href={project.github} target="_blank">
+                      <Link href={project.github} target="_blank">
                         <BsGithub
                           size={30}
                           className="hover:-translate-y-1 transition-transform cursor-pointer"
                         />
-                      </LinkFixed>
-                      <LinkFixed href={project.link} target="_blank">
+                      </Link>
+                      <Link href={project.link} target="_blank">
                         <BsArrowUpRightSquare
                           size={30}
                           className="hover:-translate-y-1 transition-transform cursor-pointer"
                         />
-                      </LinkFixed>
+                      </Link>
                     </div>
                   </div>
                 </div>

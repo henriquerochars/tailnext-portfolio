@@ -1,23 +1,30 @@
 # Henrique Rocha Dev Portfolio
 
-Personal portfolio built with Next.js and Tailwind CSS and deployed on Vercel.
+Personal portfolio for Henrique Rocha Serrano, built with Next.js and deployed on Vercel.
+
+## Stack
+
+- Next.js 16
+- React 19
+- TypeScript 5.9
+- Tailwind CSS 4
+- next-themes
+- Vercel
 
 ## Requirements
 
 - Node.js 24.x
-- Yarn 1.x
+- Yarn 1.22.22
 
-If you use `nvm`, run:
+If you use `nvm`:
 
 ```bash
 nvm use
 ```
 
-The repository includes an `.nvmrc` file pinned to Node.js 24.
+## Local development
 
-## Running locally
-
-Install dependencies using the existing Yarn lockfile:
+Install dependencies from the committed lockfile:
 
 ```bash
 yarn install --frozen-lockfile
@@ -29,15 +36,28 @@ Start the development server:
 yarn dev
 ```
 
-The application will be available at `http://localhost:3000`.
+Open `http://localhost:3000`.
 
-## Production build
+## Quality checks
+
+Run the same checks enforced by CI:
 
 ```bash
+yarn typecheck
+yarn lint
 yarn build
+```
+
+## Production
+
+Start a previously built production bundle with:
+
+```bash
 yarn start
 ```
 
-## Deployment
+The production site is deployed on Vercel at:
 
-The project is deployed on Vercel. The Node.js runtime is declared in `package.json` through `engines.node`, so Vercel builds and functions use Node.js 24.x.
+- https://henriquerochadev.vercel.app
+
+The Node.js runtime is declared in `package.json` through `engines.node`.

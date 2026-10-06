@@ -1,4 +1,5 @@
 name: Upgrade Next 16 validation
+# Temporary validation workflow for issue #4
 
 on:
   push:

@@ -23,10 +23,10 @@ test.describe("portfolio smoke coverage", () => {
   test("navigates between Home and About", async ({ page }) => {
     await page.goto("/")
 
-    await page.getByRole("button", { name: "About" }).click()
+    await page.getByRole("button", { name: "About", exact: true }).click()
     await expect(page.locator("#about")).toBeInViewport()
 
-    await page.getByRole("button", { name: "Home" }).click()
+    await page.getByRole("button", { name: "Home", exact: true }).click()
     await expect(page.locator("#home")).toBeInViewport()
   })
 
@@ -70,9 +70,9 @@ test.describe("portfolio smoke coverage", () => {
 
     await page.getByRole("button", { name: "Open navigation menu" }).click()
     await expect(page.getByRole("button", { name: "Close navigation menu" })).toBeVisible()
-    await expect(page.getByRole("button", { name: "About" })).toBeVisible()
+    await expect(page.getByRole("button", { name: "About", exact: true })).toBeVisible()
 
-    await page.getByRole("button", { name: "About" }).click()
+    await page.getByRole("button", { name: "About", exact: true }).click()
     await expect(page.locator("#about")).toBeInViewport()
     await expect(page.getByRole("button", { name: "Open navigation menu" })).toBeVisible()
   })

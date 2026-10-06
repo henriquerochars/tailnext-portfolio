@@ -1,19 +1,23 @@
-"use client"; // this is a client component
-import React from "react";
-import Image from "next/image";
-import { Link } from "react-scroll/modules";
-import { HiArrowDown } from "react-icons/hi";
+"use client"
 
-const LinkFixed = Link as unknown as React.FC<any>;
+import Image from "next/image"
+import { HiArrowDown } from "react-icons/hi"
 
 const HeroSection = () => {
+  const scrollToAbout = () => {
+    document.getElementById("about")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    })
+  }
+
   return (
     <section id="home">
       <div className="flex flex-col text-center items-center justify-center animate-fadeIn animation-delay-2 my-10 py-16 sm:py-32 md:py-48 md:flex-row md:space-x-4 md:text-left">
         <div className="md:mt-2 md:w-1/2">
           <Image
             src="/perfil.jpeg"
-            alt=""
+            alt="Henrique Rocha"
             width={325}
             height={325}
             className="rounded-full shadow-2xl"
@@ -31,34 +35,20 @@ const HeroSection = () => {
             based in Rio de Janeiro, Brazil. Working towards creating software
             that makes life easier and more meaningful.
           </p>
-
-          {/* <LinkFixed
-            to="projects"
-            className="text-neutral-100 font-semibold px-6 py-3 bg-teal-600 rounded shadow hover:bg-teal-700"
-            activeClass="active"
-            spy={true}
-            smooth={true}
-            offset={-100}
-            duration={500}
-          >
-            Projects
-          </LinkFixed> */}
         </div>
       </div>
-      <div className="cursor-pointer flex flex-row items-center text-center justify-center ">
-        <LinkFixed
-          to="about"
-          activeClass="active"
-          spy={true}
-          smooth={true}
-          offset={-100}
-          duration={500}
+      <div className="flex flex-row items-center justify-center text-center">
+        <button
+          type="button"
+          onClick={scrollToAbout}
+          aria-label="Scroll to About section"
+          className="cursor-pointer"
         >
           <HiArrowDown size={35} className="animate-bounce" />
-        </LinkFixed>
+        </button>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default HeroSection;
+export default HeroSection

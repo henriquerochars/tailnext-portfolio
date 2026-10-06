@@ -1,6 +1,6 @@
 "use client" // this is a client component
 
-import React, { useEffect, useRef, ReactNode } from "react"
+import { useEffect, useRef, ReactNode } from "react"
 interface Props {
   offset?: string
   children?: ReactNode
@@ -26,7 +26,7 @@ export default function SlideUp({ children, offset = "0px" }: Props) {
     if (ref.current) {
       observer.observe(ref.current)
     }
-  }, [ref])
+  }, [offset])
 
   return (
     <div ref={ref} className="relative opacity-0">

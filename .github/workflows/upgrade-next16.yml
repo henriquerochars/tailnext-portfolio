@@ -1,0 +1,38 @@
+name: Upgrade Next 16 validation
+
+on:
+  push:
+    branches:
+      - chore/issue-4-next-16
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Refresh lockfile
+        run: yarn install
+
+      - name: Type check
+        run: yarn typecheck
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Build
+        run: yarn build
+
+      - name: Upload refreshed lockfile
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: next16-yarn-lock
+          path: yarn.lock

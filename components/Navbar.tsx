@@ -1,17 +1,14 @@
-"use client"; // this is a client component
-import React from "react";
-import { useState } from "react";
-import { Link } from "react-scroll/modules";
-import { useTheme } from "next-themes";
-import { RiMoonFill, RiSunLine } from "react-icons/ri";
-import { IoMdMenu, IoMdClose } from "react-icons/io";
+"use client"
 
-const LinkFixed = Link as unknown as React.FC<any>;
+import { useState } from "react"
+import { useTheme } from "next-themes"
+import { RiMoonFill, RiSunLine } from "react-icons/ri"
+import { IoMdMenu, IoMdClose } from "react-icons/io"
 
 interface NavItem {
-  label: string;
-  page: string;
-  external?: boolean;
+  label: string
+  page: string
+  external?: boolean
 }
 
 const NAV_ITEMS: Array<NavItem> = [
@@ -23,33 +20,42 @@ const NAV_ITEMS: Array<NavItem> = [
     label: "About",
     page: "about",
   },
-  // {
-  //   label: "Projects",
-  //   page: "projects",
-  // },
   {
     label: "Blog pt-br",
     page: "https://henriquerochadevblog.vercel.app",
     external: true,
   },
-];
+]
 
 export default function Navbar() {
-  const { systemTheme, theme, setTheme } = useTheme();
-  const currentTheme = theme === "system" ? systemTheme : theme;
-  const [navbar, setNavbar] = useState(false);
+  const { systemTheme, theme, setTheme } = useTheme()
+  const currentTheme = theme === "system" ? systemTheme : theme
+  const [navbar, setNavbar] = useState(false)
+
+  const scrollToSection = (sectionId: string) => {
+    document.getElementById(sectionId)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    })
+    setNavbar(false)
+  }
+
   return (
-    <header className="w-full mx-auto  px-4 sm:px-20 fixed top-0 z-50 shadow bg-white dark:bg-stone-900 dark:border-b dark:border-stone-600">
+    <header className="w-full mx-auto px-4 sm:px-20 fixed top-0 z-50 shadow bg-white dark:bg-stone-900 dark:border-b dark:border-stone-600">
       <div className="justify-between md:items-center md:flex">
         <div>
           <div className="flex items-center justify-between py-3 md:py-5 md:block">
-            <LinkFixed to="home">
-              <div className="container flex items-center space-x-2">
-                <h2 className="text-2xl font-bold">Henrique Rocha Dev</h2>
-              </div>
-            </LinkFixed>
+            <button
+              type="button"
+              onClick={() => scrollToSection("home")}
+              className="container flex items-center space-x-2"
+            >
+              <h2 className="text-2xl font-bold">Henrique Rocha Dev</h2>
+            </button>
             <div className="md:hidden">
               <button
+                type="button"
+                aria-label={navbar ? "Close navigation menu" : "Open navigation menu"}
                 className="p-2 text-gray-700 rounded-md outline-none focus:border-gray-400 focus:border"
                 onClick={() => setNavbar(!navbar)}
               >
@@ -66,37 +72,32 @@ export default function Navbar() {
             }`}
           >
             <div className="items-center justify-center space-y-8 md:flex md:space-x-6 md:space-y-0">
-              {NAV_ITEMS.map((item, idx) => {
-                return !item.external ? (
-                  <LinkFixed
-                    key={idx}
-                    to={item.page}
-                    className={
-                      "cursor-pointer block lg:inline-block text-neutral-900  hover:text-neutral-500 dark:text-neutral-100"
-                    }
-                    activeClass="active"
-                    spy={true}
-                    smooth={true}
-                    offset={-100}
-                    duration={500}
-                    onClick={() => setNavbar(!navbar)}
-                  >
-                    {item.label}
-                  </LinkFixed>
-                ) : (
+              {NAV_ITEMS.map((item) =>
+                item.external ? (
                   <a
                     href={item.page}
                     target="_blank"
                     rel="noopener noreferrer"
-                    key={idx}
-                    className="cursor-pointer block lg:inline-block text-neutral-900  hover:text-neutral-500 dark:text-neutral-100"
+                    key={item.label}
+                    className="cursor-pointer block lg:inline-block text-neutral-900 hover:text-neutral-500 dark:text-neutral-100"
                   >
                     {item.label}
                   </a>
-                );
-              })}
+                ) : (
+                  <button
+                    type="button"
+                    key={item.label}
+                    onClick={() => scrollToSection(item.page)}
+                    className="cursor-pointer block lg:inline-block text-neutral-900 hover:text-neutral-500 dark:text-neutral-100"
+                  >
+                    {item.label}
+                  </button>
+                )
+              )}
               {currentTheme === "dark" ? (
                 <button
+                  type="button"
+                  aria-label="Switch to light theme"
                   onClick={() => setTheme("light")}
                   className="bg-slate-300 p-2 rounded-xl"
                 >
@@ -104,6 +105,8 @@ export default function Navbar() {
                 </button>
               ) : (
                 <button
+                  type="button"
+                  aria-label="Switch to dark theme"
                   onClick={() => setTheme("dark")}
                   className="bg-slate-300 p-2 rounded-xl"
                 >
@@ -115,5 +118,5 @@ export default function Navbar() {
         </div>
       </div>
     </header>
-  );
+  )
 }

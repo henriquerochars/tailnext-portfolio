@@ -1,27 +1,32 @@
-"use client"
-import "../styles/globals.css"
-import Navbar from "@/components/Navbar"
+import type { Metadata } from "next"
+
 import Footer from "@/components/Footer"
-import { ThemeProvider } from "next-themes"
+import Navbar from "@/components/Navbar"
+import Providers from "./providers"
+import "../styles/globals.css"
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://henriquerochadev.vercel.app"),
+  title: "Henrique Rocha Dev",
+  description: "Personal portfolio of Henrique Rocha Serrano, Software Engineer.",
+  icons: {
+    icon: "/favicon.ico",
+  },
+}
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode
-}) {
+}>) {
   return (
-    <html lang="en">
-      {/*
-        <head /> will contain the components returned by the nearest parent
-        head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
-      */}
-      <head />
+    <html lang="en" suppressHydrationWarning>
       <body className="dark:bg-stone-900">
-        <ThemeProvider enableSystem={true} attribute="class">
+        <Providers>
           <Navbar />
           {children}
           <Footer />
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   )

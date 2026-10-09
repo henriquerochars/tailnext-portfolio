@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "commands": [
+    {
+      "display": "yarn test:harness",
+      "argv": [
+        "node",
+        "scripts/agent/test-harness.mjs"
+      ],
+      "timeoutSeconds": 300
+    },
+    {
+      "display": "node scripts/agent/docs-check.mjs",
+      "argv": [
+        "node",
+        "scripts/agent/docs-check.mjs"
+      ],
+      "timeoutSeconds": 120
+    }
+  ]
+}

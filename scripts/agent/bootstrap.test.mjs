@@ -1,0 +1,49 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtemp, writeFile, readFile, rm, symlink, realpath } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { parseArgs, withLease, atomicJson, childEnvironment } from './bootstrap.mjs';
+import { sourceSnapshot } from './snapshot.mjs';
+
+async function fixture(t) {
+  const root=await mkdtemp(path.join(os.tmpdir(),'portfolio-snapshot-')); t.after(()=>rm(root,{recursive:true,force:true}));
+  const git=(...args)=>execFileSync('git',args,{cwd:root,encoding:'utf8',env:{PATH:process.env.PATH,HOME:root,GIT_CONFIG_NOSYSTEM:'1',GIT_CONFIG_GLOBAL:'/dev/null'},stdio:['ignore','pipe','pipe']}).trim();
+  git('init','-b','fixture'); git('config','user.email','fixture@example.invalid'); git('config','user.name','Synthetic Fixture');
+  await writeFile(path.join(root,'yarn.lock'),'synthetic lock\n'); await writeFile(path.join(root,'source.txt'),'reviewed\n');
+  git('add','.');git('commit','-m','fixture'); return {root,git,sha:git('rev-parse','HEAD')};
+}
+test('full revisions, issue and session required; duplicate/unknown args fail',()=>{
+  const argv=['--revision','a'.repeat(40),'--issue','17','--session','one']; assert.equal(parseArgs(argv).session,'one');
+  for(const tail of [['--revision','b'.repeat(40)],['--unknown','x'],['--reuse','--reuse'],['--session','../escape']]) assert.throws(()=>parseArgs([...argv,...tail]));
+});
+test('source snapshot refuses assume-unchanged and skip-worktree hidden edits',async t=>{
+  for(const flag of ['--assume-unchanged','--skip-worktree']) {
+    const {root,git,sha}=await fixture(t); await sourceSnapshot(root,sha); git('update-index',flag,'source.txt'); await writeFile(path.join(root,'source.txt'),'hidden edit\n');
+    await assert.rejects(sourceSnapshot(root,sha),/Hidden source\/index edit/);
+  }
+});
+test('source snapshot binds base/tree/branch and rejects dirty, staged, symlink and wrong head',async t=>{
+  const {root,git,sha}=await fixture(t); const snapshot=await sourceSnapshot(root,sha,sha);
+  assert.equal(snapshot.base,sha);assert.equal(snapshot.mergeBase,sha);assert.equal(snapshot.branch,'fixture');
+  await assert.rejects(sourceSnapshot(root,'f'.repeat(40)),/differs from HEAD/);
+  await writeFile(path.join(root,'source.txt'),'staged');git('add','source.txt');await assert.rejects(sourceSnapshot(root,sha),/Clean/);
+  git('restore','--staged','source.txt');git('restore','source.txt');await rm(path.join(root,'source.txt'));await symlink('/dev/null',path.join(root,'source.txt'));await assert.rejects(sourceSnapshot(root,sha));
+});
+test('exclusive lease spans operation and is released only by its live owner',async t=>{
+  const directory=await realpath(await mkdtemp(path.join(os.tmpdir(),'portfolio-lease-')));t.after(()=>rm(directory,{recursive:true,force:true}));
+  const context={directory,claim:{session:'one'}};
+  await withLease(context,async()=>{await assert.rejects(withLease(context,async()=>{}),/lease already exists/);});
+  await assert.rejects(readFile(path.join(directory,'active.json')),/ENOENT/);
+  await writeFile(path.join(directory,'active.json'),'stale diagnostic');await assert.rejects(withLease(context,async()=>{}),/inspect stale state/);
+});
+test('private JSON rejects symlink escapes and permissive state',async t=>{
+  const directory=await realpath(await mkdtemp(path.join(os.tmpdir(),'portfolio-state-')));t.after(()=>rm(directory,{recursive:true,force:true}));
+  await atomicJson(directory,'receipt.json',{status:'incomplete'});assert.equal(JSON.parse(await readFile(path.join(directory,'receipt.json'))).status,'incomplete');
+  const linked=directory+'-link';await symlink(directory,linked);t.after(()=>rm(linked));await assert.rejects(atomicJson(linked,'receipt.json',{}),/Unsafe/);
+});
+test('minimal execution environment excludes ambient tokens and tool options',()=>{
+  const env=childEnvironment({node:'/owned/node',yarn:'/owned/yarn/bin/yarn.js'},'/owned/session',45000);
+  assert.equal(env.HARNESS_PORT,'45000');assert.equal(env.NODE_OPTIONS,undefined);assert.equal(env.GITHUB_TOKEN,undefined);assert.equal(env.VERCEL_TOKEN,undefined);
+});

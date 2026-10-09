@@ -1,0 +1,310 @@
+{
+  "version": 1,
+  "owner": "portfolio-harness",
+  "summaryCheck": "required-summary",
+  "runtime": {
+    "node": "24.21.0",
+    "yarn": "1.22.22"
+  },
+  "jobs": [
+    {
+      "id": "structure",
+      "timeoutMinutes": 10,
+      "notApplicableReason": null
+    },
+    {
+      "id": "validate",
+      "timeoutMinutes": 25,
+      "notApplicableReason": "reviewed-docs-only"
+    },
+    {
+      "id": "validate-macos",
+      "timeoutMinutes": 25,
+      "notApplicableReason": "reviewed-docs-only"
+    }
+  ],
+  "gates": [
+    {
+      "id": "prompt-budget",
+      "job": "structure",
+      "argv": [
+        "node",
+        "scripts/agent/prompt-budget.mjs"
+      ],
+      "timeoutSeconds": 120,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": []
+    },
+    {
+      "id": "docs-check",
+      "job": "structure",
+      "argv": [
+        "node",
+        "scripts/agent/docs-check.mjs"
+      ],
+      "timeoutSeconds": 120,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": []
+    },
+    {
+      "id": "spec-templates",
+      "job": "structure",
+      "argv": [
+        "node",
+        "scripts/agent/spec-templates.mjs"
+      ],
+      "timeoutSeconds": 120,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": []
+    },
+    {
+      "id": "skills-validate",
+      "job": "structure",
+      "argv": [
+        "node",
+        "scripts/agent/skills-validate.mjs"
+      ],
+      "timeoutSeconds": 120,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": []
+    },
+    {
+      "id": "workflow",
+      "job": "structure",
+      "argv": [
+        "node",
+        "scripts/agent/ci-workflow.mjs",
+        "--check"
+      ],
+      "timeoutSeconds": 120,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": []
+    },
+    {
+      "id": "learning-canary",
+      "job": "structure",
+      "argv": [
+        "node",
+        "scripts/agent/harness-canary.mjs"
+      ],
+      "timeoutSeconds": 120,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": []
+    },
+    {
+      "id": "harness-tests",
+      "job": "structure",
+      "argv": [
+        "node",
+        "scripts/agent/test-harness.mjs"
+      ],
+      "timeoutSeconds": 300,
+      "zeroSkips": true,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": []
+    },
+    {
+      "id": "typecheck",
+      "job": "validate",
+      "argv": [
+        "yarn",
+        "typecheck"
+      ],
+      "timeoutSeconds": 120,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": [
+        "reviewed-docs-only"
+      ]
+    },
+    {
+      "id": "lint",
+      "job": "validate",
+      "argv": [
+        "yarn",
+        "lint"
+      ],
+      "timeoutSeconds": 120,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": [
+        "reviewed-docs-only"
+      ]
+    },
+    {
+      "id": "build",
+      "job": "validate",
+      "argv": [
+        "yarn",
+        "build"
+      ],
+      "timeoutSeconds": 300,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": [
+        "reviewed-docs-only"
+      ]
+    },
+    {
+      "id": "browser-prepare",
+      "job": "validate",
+      "argv": [
+        "yarn",
+        "playwright",
+        "install",
+        "--with-deps",
+        "chromium"
+      ],
+      "timeoutSeconds": 300,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": [
+        "reviewed-docs-only"
+      ]
+    },
+    {
+      "id": "browser",
+      "job": "validate",
+      "argv": [
+        "yarn",
+        "test:e2e:ci"
+      ],
+      "timeoutSeconds": 180,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": [
+        "reviewed-docs-only"
+      ]
+    },
+    {
+      "id": "macos-typecheck",
+      "job": "validate-macos",
+      "argv": [
+        "yarn",
+        "typecheck"
+      ],
+      "timeoutSeconds": 120,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": [
+        "reviewed-docs-only"
+      ]
+    },
+    {
+      "id": "macos-lint",
+      "job": "validate-macos",
+      "argv": [
+        "yarn",
+        "lint"
+      ],
+      "timeoutSeconds": 120,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": [
+        "reviewed-docs-only"
+      ]
+    },
+    {
+      "id": "macos-build",
+      "job": "validate-macos",
+      "argv": [
+        "yarn",
+        "build"
+      ],
+      "timeoutSeconds": 300,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": [
+        "reviewed-docs-only"
+      ]
+    },
+    {
+      "id": "macos-browser-prepare",
+      "job": "validate-macos",
+      "argv": [
+        "yarn",
+        "playwright",
+        "install",
+        "--with-deps",
+        "chromium"
+      ],
+      "timeoutSeconds": 300,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": [
+        "reviewed-docs-only"
+      ]
+    },
+    {
+      "id": "macos-browser",
+      "job": "validate-macos",
+      "argv": [
+        "yarn",
+        "test:e2e:ci"
+      ],
+      "timeoutSeconds": 180,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": [
+        "reviewed-docs-only"
+      ]
+    }
+  ]
+}

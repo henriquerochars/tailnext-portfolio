@@ -1,6 +1,6 @@
 # Portfolio harness — single-PR implementation plan
 
-Status: Proposed
+Status: Frozen evidence
 Owner: Henrique Rocha Serrano; target implementation issue to be created.
 Prepared: 2026-10-09.
 Terminal artifact: one independently reviewed PR against `henriquerochars/tailnext-portfolio`, base branch `final`, with exact-revision verification evidence.

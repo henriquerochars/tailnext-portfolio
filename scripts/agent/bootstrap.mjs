@@ -1,0 +1,131 @@
+import { mkdir, mkdtemp, realpath, lstat, readFile, writeFile, open, rm } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { hash, sourceSnapshot, treeManifest } from './snapshot.mjs';
+import { reviewedTools, commandVector } from './run-yarn.mjs';
+import { runOwned, requireSuccess } from './process.mjs';
+
+export function parseArgs(argv) {
+  const args = {};
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === '--reuse' && !args.reuse) { args.reuse = true; continue; }
+    const key = argv[i]?.replace(/^--/, '');
+    if (!['revision', 'base', 'issue', 'session'].includes(key) || Object.hasOwn(args, key) || !argv[i+1] || argv[i+1].startsWith('--')) throw new Error('Invalid/duplicate harness argument');
+    args[key] = argv[++i];
+  }
+  if (!/^[a-f0-9]{40}$/.test(args.revision ?? '') || !/^[1-9]\d*$/.test(args.issue ?? '')
+    || !/^[a-z0-9][a-z0-9-]{0,47}$/.test(args.session ?? '') || (args.base && !/^[a-f0-9]{40}$/.test(args.base))) throw new Error('Requires --revision SHA --issue NUMBER --session SLUG [--base SHA] [--reuse]');
+  return args;
+}
+async function privateDirectory(directory) {
+  await mkdir(directory, { mode: 0o700, recursive: true });
+  const stat = await lstat(directory);
+  if (!stat.isDirectory() || stat.isSymbolicLink() || stat.uid !== process.getuid() || (stat.mode & 0o077) || await realpath(directory) !== directory) throw new Error('Unsafe private state directory');
+}
+export async function atomicJson(directory, name, value) {
+  await privateDirectory(directory);
+  const temporary = path.join(directory, `.write-${process.pid}-${Math.random().toString(16).slice(2)}`);
+  const handle = await open(temporary, 'wx', 0o600);
+  try { await handle.writeFile(`${JSON.stringify(value, null, 2)}\n`); await handle.sync(); } finally { await handle.close(); }
+  const { rename } = await import('node:fs/promises');
+  await rename(temporary, path.join(directory, name));
+}
+export function childEnvironment(tools, directory, port) {
+  // No tokens, NODE_OPTIONS, user npm configuration, project .env or ambient CI outputs.
+  return { PATH: `${path.dirname(tools.node)}:${path.join(directory, 'bin')}:/usr/bin:/bin:/usr/sbin:/sbin`,
+    HOME: path.join(directory, 'home'), TMPDIR: path.join(directory, 'tmp'), LANG: 'en_US.UTF-8', CI: 'true',
+    NEXT_TELEMETRY_DISABLED: '1', YARN_CACHE_FOLDER: path.join(directory, 'cache'),
+    npm_config_userconfig: path.join(directory, 'empty.npmrc'), npm_config_globalconfig: path.join(directory, 'empty.npmrc'),
+    PLAYWRIGHT_BROWSERS_PATH: path.join(directory, 'browsers'), HARNESS_YARN: tools.yarn,
+    ...(port ? { HARNESS_PORT: String(port), HARNESS_SERVER_OWNED: '1' } : {}) };
+}
+export async function sessionContext(root, args, { create = false } = {}) {
+  root = await realpath(root);
+  const snapshot = await sourceSnapshot(root, args.revision, args.base ?? null);
+  const tools = await reviewedTools();
+  const loaded = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
+  if (await realpath(loaded) !== root) throw new Error('Run the reviewed harness from its own worktree');
+  if ((await readFile(path.join(root, '.node-version'), 'utf8')).trim() !== tools.versions.node
+    || JSON.parse(await readFile(path.join(root, 'package.json'))).packageManager !== `yarn@${tools.versions.yarn}`) throw new Error('Runtime pins differ');
+  const parent = path.join(await realpath(os.tmpdir()), `portfolio-harness-${process.getuid()}`);
+  await privateDirectory(parent);
+  // A physical worktree has one claim, regardless of issue/session aliases.
+  const directory = path.join(parent, hash(root));
+  await privateDirectory(directory);
+  const claim = { version: 1, root, branch: snapshot.branch, revision: args.revision, issue: args.issue, session: args.session };
+  const claimPath = path.join(directory, 'claim.json');
+  if (create) {
+    try { const handle = await open(claimPath, 'wx', 0o600); await handle.writeFile(JSON.stringify(claim)); await handle.close(); }
+    catch (error) { if (error.code !== 'EEXIST') throw error; }
+  }
+  const stat = await lstat(claimPath);
+  if (!stat.isFile() || stat.isSymbolicLink() || stat.uid !== process.getuid() || (stat.mode & 0o077)) throw new Error('Unsafe claim file');
+  if (JSON.stringify(JSON.parse(await readFile(claimPath))) !== JSON.stringify(claim)) throw new Error('Duplicate worktree ownership; inspect the prior claim explicitly');
+  return { root, args, snapshot, tools, directory, claim };
+}
+export async function withLease(context, operation) {
+  await privateDirectory(context.directory);
+  const leasePath = path.join(context.directory, 'active.json');
+  let handle;
+  try { handle = await open(leasePath, 'wx', 0o600); }
+  catch (error) { if (error.code === 'EEXIST') throw new Error('Execution lease already exists; inspect stale state manually; no PID kill is authorized'); throw error; }
+  const nonce = randomUUID();
+  await handle.writeFile(JSON.stringify({ nonce, pid: process.pid, createdAt: new Date().toISOString(), claim: context.claim }));
+  await handle.close();
+  try { return await operation(); }
+  finally {
+    // Only this live invocation may release this lease.
+    if (JSON.parse(await readFile(leasePath)).nonce === nonce) await rm(leasePath);
+  }
+}
+export async function prepare(context) {
+  const startedAt = Date.now();
+  const { directory, root, tools, args } = context;
+  const work = await mkdtemp(path.join(directory, 'verification-'));
+  // Reviewed archive, never hardlinks to mutable source or dependencies.
+  const archive = path.join(work, 'source.tar');
+  execFileSync('git', ['-C', root, 'archive', '--format=tar', `--output=${archive}`, args.revision], { timeout: 20_000 });
+  execFileSync('tar', ['-xf', archive, '-C', work], { timeout: 20_000 });
+  await rm(archive);
+  for (const name of ['home', 'tmp', 'cache', 'bin', 'browsers']) await privateDirectory(path.join(directory, name));
+  await writeFile(path.join(directory, 'empty.npmrc'), '', { mode: 0o600 });
+  // Yarn scripts resolve the reviewed launcher through this private shim.
+  await writeFile(path.join(directory, 'bin/yarn'), `#!/bin/sh\nexec '${tools.node.replaceAll("'", "'\\''")}' '${tools.yarn.replaceAll("'", "'\\''")}' "$@"\n`, { mode: 0o700 });
+  const env = childEnvironment(tools, directory);
+  const install = requireSuccess(await runOwned(commandVector(['yarn', 'install', '--frozen-lockfile', '--ignore-scripts', '--non-interactive', '--production=false'], tools), {
+    cwd: work, env, timeoutMs: 480_000,
+  }), 'Frozen reviewed install');
+  await writeFile(path.join(directory, 'install.log'), `${install.stdout}\n${install.stderr}`, { mode: 0o600 });
+  if (hash(await readFile(path.join(work, 'yarn.lock'))) !== context.snapshot.lock) throw new Error('Frozen installation changed lockfile');
+  const dependencies = await treeManifest(path.join(work, 'node_modules'));
+  const setup = { version: 1, claim: context.claim, tools, work, dependencies, source: context.snapshot.files, lock: context.snapshot.lock, installDurationMs: Date.now() - startedAt };
+  await atomicJson(directory, 'setup.json', setup);
+  return setup;
+}
+export async function loadSetup(context) {
+  const file = path.join(context.directory, 'setup.json');
+  const stat = await lstat(file);
+  if (!stat.isFile() || stat.isSymbolicLink() || stat.uid !== process.getuid() || (stat.mode & 0o077)) throw new Error('Unsafe setup record');
+  const setup = JSON.parse(await readFile(file));
+  if (JSON.stringify(setup.claim) !== JSON.stringify(context.claim) || JSON.stringify(setup.tools) !== JSON.stringify(context.tools)
+    || setup.source !== context.snapshot.files || setup.lock !== context.snapshot.lock
+    || !Number.isInteger(setup.installDurationMs) || setup.installDurationMs < 0 || setup.installDurationMs > 1_200_000
+    || await realpath(setup.work) !== setup.work || !(await realpath(setup.work)).startsWith(`${context.directory}${path.sep}`)) throw new Error('Stale/escaped setup; run setup again');
+  if (JSON.stringify(await treeManifest(path.join(setup.work, 'node_modules'))) !== JSON.stringify(setup.dependencies)) throw new Error('Installed dependency bytes changed');
+  return setup;
+}
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  try {
+    const args = parseArgs(process.argv.slice(2));
+    const context = await sessionContext(process.cwd(), args, { create: true });
+    await withLease(context, async () => {
+      await atomicJson(context.directory, 'receipt.json', { version: 1, status: 'incomplete', reason: 'setup-started' });
+      await prepare(context);
+      await sourceSnapshot(context.root, args.revision, args.base ?? null);
+    });
+    console.log(`Reviewed setup ready in private storage (${args.session}); verification remains pending.`);
+  } catch (error) { console.error(error.message); process.exitCode = 1; }
+}

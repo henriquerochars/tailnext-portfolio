@@ -37,3 +37,8 @@ yarn-error.log*
 next-env.d.ts
 
 package-lock.json
+
+# Owned verification outputs
+/playwright-report/
+/test-results/
+/blob-report/

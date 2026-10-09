@@ -1,3 +1,7 @@
+Status: Live
+Owner: Henrique Rocha Serrano
+Source: Modern portfolio baseline and issue #17 implementation.
+
 # Henrique Rocha Dev Portfolio
 
 Personal portfolio for Henrique Rocha Serrano, built with Next.js and deployed on Vercel.
@@ -61,3 +65,7 @@ The production site is deployed on Vercel at:
 - https://henriquerochadev.vercel.app
 
 The Node.js runtime is declared in `package.json` through `engines.node`.
+
+## Engineering harness
+
+Read the [engineering index](docs/engineering/index.md) and [reviewed setup](docs/engineering/bootstrap.md). Native macOS and Linux verification use Node 24.21.0 / Yarn 1.22.22; Vercel uses Node 24.x.

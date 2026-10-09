@@ -9,7 +9,11 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test:e2e": "yarn build && playwright test",
-    "test:e2e:ci": "playwright test"
+    "test:e2e:ci": "playwright test",
+    "harness:setup": "node scripts/agent/bootstrap.mjs",
+    "harness:verify": "node scripts/agent/check-changed.mjs",
+    "test:harness": "node scripts/agent/test-harness.mjs",
+    "harness:docs": "node scripts/agent/docs-check.mjs"
   },
   "dependencies": {
     "next": "16.4.0",

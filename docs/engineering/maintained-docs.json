@@ -1,0 +1,201 @@
+{
+  "version": 1,
+  "documents": [
+    {
+      "path": "AGENTS.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "CLAUDE.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "README.md",
+      "owner": "issue-17",
+      "scope": "Portfolio setup",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/acceptance.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/bootstrap.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/ci.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/claude-setup.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/codex-setup.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/command-policy.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/implementation-decision.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/index.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/instruction-policy.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/knowledge-deltas/README.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/local-development.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/pr-delivery.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/pr-review.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/repo-map.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/task-handoff.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/templates/README.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/templates/acceptance.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Proposed",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/templates/adr.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Proposed",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/templates/plan.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Proposed",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/templates/spec.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Proposed",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/templates/task-links.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Proposed",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/engineering/verification.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Live",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/plans/engineering-harness-implementation-plan.md",
+      "owner": "issue-17",
+      "scope": "Portfolio engineering",
+      "status": "Frozen evidence",
+      "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    }
+  ],
+  "instructions": [
+    {
+      "path": "AGENTS.md",
+      "scope": ".",
+      "kind": "canonical",
+      "canonical": "AGENTS.md"
+    },
+    {
+      "path": "CLAUDE.md",
+      "scope": ".",
+      "kind": "pointer",
+      "canonical": "AGENTS.md"
+    }
+  ]
+}

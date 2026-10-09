@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "boards": "disabled",
+  "skills": {
+    "start-task": [
+      "docs/engineering/repo-map.md",
+      "docs/engineering/bootstrap.md"
+    ],
+    "review-change": [
+      "docs/engineering/pr-review.md",
+      "docs/engineering/verification.md"
+    ],
+    "deliver-task": [
+      "docs/engineering/pr-delivery.md",
+      "docs/engineering/task-handoff.md"
+    ],
+    "capture-learning": [
+      "docs/engineering/knowledge-deltas/README.md"
+    ],
+    "implement-ticket": [
+      "docs/engineering/acceptance.md",
+      "docs/engineering/verification.md"
+    ]
+  }
+}

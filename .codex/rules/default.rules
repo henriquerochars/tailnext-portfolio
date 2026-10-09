@@ -1,0 +1,36 @@
+# Restrictive escalation overlays, not a full shell parser or sandbox replacement.
+# Rules apply outside the sandbox in supported, trusted Codex project layers.
+# No allow prefix: appended flags and shell wrappers must never inherit a grant.
+prefix_rule(
+    pattern = ["git"],
+    decision = "prompt",
+    justification = "Review Git escalation against existing task authorization; ordinary sandbox reads need no new grant.",
+    match = ["git status", "git -C /tmp/example push --force"],
+)
+prefix_rule(
+    pattern = ["git", "reset", "--hard"],
+    decision = "forbidden",
+    justification = "Hard reset may discard uncommitted work. Use a separately reviewed recovery path.",
+    match = ["git reset --hard", "git reset --hard HEAD"],
+    not_match = ["git --no-pager reset --hard"],
+)
+prefix_rule(
+    pattern = ["rm"],
+    decision = "prompt",
+    justification = "Review deletion target and task scope before escalation.",
+    match = ["rm --recursive --force /tmp/example"],
+)
+prefix_rule(
+    pattern = ["rm", ["-rf", "-fr"], "/"],
+    decision = "forbidden",
+    justification = "Recursive root deletion is forbidden. Use an explicitly scoped disposable fixture.",
+    match = ["rm -rf /", "rm -fr /"],
+    not_match = ["rm -r -f /", "rm -rf /tmp/example"],
+)
+prefix_rule(
+    pattern = [["yarn", "npm", "npx", "node", "vercel", "gh", "curl", "wget", "bash", "sh", "zsh"]],
+    decision = "prompt",
+    justification = "Escalation may execute mutable code, access network or publish. Apply native requirements and existing task authorization.",
+    match = ["yarn lint", "node scripts/agent/docs-check.mjs", "vercel deploy", "bash -c unknown"],
+    not_match = ["env yarn lint"],
+)

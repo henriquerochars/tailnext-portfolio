@@ -1,8 +1,6 @@
-"use client" // this is a client component
-import React from "react"
-import { useState } from "react"
-import { Link } from "react-scroll/modules"
-import { usePathname } from "next/navigation"
+"use client"
+
+import { useState, useSyncExternalStore } from "react"
 import { useTheme } from "next-themes"
 import { RiMoonFill, RiSunLine } from "react-icons/ri"
 import { IoMdMenu, IoMdClose } from "react-icons/io"
@@ -10,6 +8,7 @@ import { IoMdMenu, IoMdClose } from "react-icons/io"
 interface NavItem {
   label: string
   page: string
+  external?: boolean
 }
 
 const NAV_ITEMS: Array<NavItem> = [
@@ -22,28 +21,46 @@ const NAV_ITEMS: Array<NavItem> = [
     page: "about",
   },
   {
-    label: "Projects",
-    page: "projects",
+    label: "Blog pt-br",
+    page: "https://henriquerochadevblog.vercel.app",
+    external: true,
   },
 ]
 
+const subscribeToMount = () => () => {}
+const clientMounted = () => true
+const serverMounted = () => false
+
 export default function Navbar() {
   const { systemTheme, theme, setTheme } = useTheme()
-  const currentTheme = theme === "system" ? systemTheme : theme
-  const pathname = usePathname()
+  const mounted = useSyncExternalStore(subscribeToMount, clientMounted, serverMounted)
+  const currentTheme = mounted ? (theme === "system" ? systemTheme : theme) : "light"
   const [navbar, setNavbar] = useState(false)
+
+  const scrollToSection = (sectionId: string) => {
+    document.getElementById(sectionId)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    })
+    setNavbar(false)
+  }
+
   return (
-    <header className="w-full mx-auto  px-4 sm:px-20 fixed top-0 z-50 shadow bg-white dark:bg-stone-900 dark:border-b dark:border-stone-600">
+    <header className="w-full mx-auto px-4 sm:px-20 fixed top-0 z-50 shadow bg-white dark:bg-stone-900 dark:border-b dark:border-stone-600">
       <div className="justify-between md:items-center md:flex">
         <div>
           <div className="flex items-center justify-between py-3 md:py-5 md:block">
-            <Link to="home">
-              <div className="container flex items-center space-x-2">
-                <h2 className="text-2xl font-bold">Hosna Qasmei</h2>
-              </div>
-            </Link>
+            <button
+              type="button"
+              onClick={() => scrollToSection("home")}
+              className="container flex items-center space-x-2"
+            >
+              <h2 className="text-2xl font-bold">Henrique Rocha Dev</h2>
+            </button>
             <div className="md:hidden">
               <button
+                type="button"
+                aria-label={navbar ? "Close navigation menu" : "Open navigation menu"}
                 className="p-2 text-gray-700 rounded-md outline-none focus:border-gray-400 focus:border"
                 onClick={() => setNavbar(!navbar)}
               >
@@ -60,36 +77,44 @@ export default function Navbar() {
             }`}
           >
             <div className="items-center justify-center space-y-8 md:flex md:space-x-6 md:space-y-0">
-              {NAV_ITEMS.map((item, idx) => {
-                return (
-                  <Link
-                    key={idx}
-                    to={item.page}
-                    className={
-                      "block lg:inline-block text-neutral-900  hover:text-neutral-500 dark:text-neutral-100 cursor-pointer"
-                    }
-                    activeClass="active"
-                    spy={true}
-                    smooth={true}
-                    offset={-100}
-                    duration={500}
-                    onClick={() => setNavbar(!navbar)}
+              {NAV_ITEMS.map((item) =>
+                item.external ? (
+                  <a
+                    href={item.page}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    key={item.label}
+                    className="cursor-pointer block lg:inline-block text-neutral-900 hover:text-neutral-500 dark:text-neutral-100"
                   >
                     {item.label}
-                  </Link>
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    key={item.label}
+                    onClick={() => scrollToSection(item.page)}
+                    className="cursor-pointer block lg:inline-block text-neutral-900 hover:text-neutral-500 dark:text-neutral-100"
+                  >
+                    {item.label}
+                  </button>
                 )
-              })}
+              )}
               {currentTheme === "dark" ? (
                 <button
+                  type="button"
+                  aria-label="Switch to light theme"
                   onClick={() => setTheme("light")}
-                  className="bg-slate-100 p-2 rounded-xl"
+                  className="bg-slate-300 p-2 rounded-xl"
                 >
                   <RiSunLine size={25} color="black" />
                 </button>
               ) : (
                 <button
+                  type="button"
+                  aria-label="Switch to dark theme"
+                  disabled={!mounted}
                   onClick={() => setTheme("dark")}
-                  className="bg-slate-100 p-2 rounded-xl"
+                  className="bg-slate-300 p-2 rounded-xl"
                 >
                   <RiMoonFill size={25} />
                 </button>

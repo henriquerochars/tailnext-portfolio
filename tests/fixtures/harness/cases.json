@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "telemetry": "unknown",
+  "cases": [
+    {
+      "id": "stale-receipt",
+      "source": "synthetic",
+      "failure": "Head advanced after a pass.",
+      "fix": "Require identical fresh fingerprints and ordered gates."
+    },
+    {
+      "id": "duplicate-ownership",
+      "source": "synthetic",
+      "failure": "A second session claimed one worktree.",
+      "fix": "Reject conflicting private claim and execution lease."
+    },
+    {
+      "id": "foreign-listener",
+      "source": "synthetic",
+      "failure": "A listener occupied the session port.",
+      "fix": "Fail before browser start and leave the listener alive."
+    },
+    {
+      "id": "missing-ci-job",
+      "source": "synthetic",
+      "failure": "A selected job was absent.",
+      "fix": "Required-summary rejects missing evidence."
+    },
+    {
+      "id": "unsupported-native",
+      "source": "synthetic",
+      "failure": "Offline adapter output was mistaken for native enforcement.",
+      "fix": "Keep native capability unverified until an explicit actual probe."
+    }
+  ]
+}

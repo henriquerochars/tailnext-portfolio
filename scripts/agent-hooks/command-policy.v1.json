@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "mode": "advisory-only",
+  "readOnlyVectors": [
+    [
+      "git",
+      "status",
+      "--short"
+    ],
+    [
+      "git",
+      "diff",
+      "--stat"
+    ]
+  ]
+}

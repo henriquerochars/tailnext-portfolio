@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "issue": 17,
+  "status": "Proposed",
+  "requirements": [
+    {
+      "id": "REQ-001"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "SC-001",
+      "requirement": "REQ-001",
+      "outcome": "success",
+      "test": "TEST-001"
+    },
+    {
+      "id": "SC-002",
+      "requirement": "REQ-001",
+      "outcome": "failure",
+      "test": "TEST-002"
+    }
+  ],
+  "tests": [
+    {
+      "id": "TEST-001"
+    },
+    {
+      "id": "TEST-002"
+    }
+  ],
+  "terminalArtifact": "implementation-pr",
+  "liveEvidence": null
+}

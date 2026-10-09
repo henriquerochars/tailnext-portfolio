@@ -14,12 +14,16 @@ export async function reviewedTools(launcher = process.env.HARNESS_YARN ?? proce
   const manifest = await readFile(path.join(root, 'package.json'));
   const pkg = JSON.parse(manifest);
   if (pkg.name !== 'yarn' || pkg.version !== YARN) throw new Error(`Requires Yarn ${YARN}`);
-  const output = execFileSync(node, [yarn, '--version'], { env: { PATH: path.dirname(node) }, encoding: 'utf8', timeout: 10_000 }).trim();
-  if (output !== YARN) throw new Error('Yarn executable version mismatch');
   const cli = await realpath(path.join(root, 'lib/cli.js'));
-  if (!cli.startsWith(`${root}${path.sep}`)) throw new Error('Yarn CLI escapes installation');
+  const compileCache = await realpath(path.join(root, 'lib/v8-compile-cache.js'));
+  if (![cli, compileCache].every(file => file.startsWith(`${root}${path.sep}`))) throw new Error('Yarn CLI escapes installation');
+  const output = execFileSync(node, [yarn, '--no-default-rc', '--version'], {
+    env: { PATH: path.dirname(node), DISABLE_V8_COMPILE_CACHE: '1' }, encoding: 'utf8', timeout: 10_000,
+  }).trim();
+  if (output !== YARN) throw new Error('Yarn executable version mismatch');
   return { node, yarn, versions: { node: NODE, yarn: YARN }, hashes: {
-    node: digest(await readFile(node)), launcher: digest(await readFile(yarn)), cli: digest(await readFile(cli)), manifest: digest(manifest),
+    node: digest(await readFile(node)), launcher: digest(await readFile(yarn)), cli: digest(await readFile(cli)),
+    compileCache: digest(await readFile(compileCache)), manifest: digest(manifest),
   } };
 }
 export function commandVector(argv, tools) {

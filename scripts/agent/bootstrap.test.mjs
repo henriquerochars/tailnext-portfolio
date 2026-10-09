@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { parseArgs, withLease, atomicJson, childEnvironment, ownedState, setup, executionConfiguration, yarnShim } from './bootstrap.mjs';
-import { commandVector } from './run-yarn.mjs';
+import { commandVector, reviewedTools } from './run-yarn.mjs';
 import { sourceSnapshot, treeManifest, outputManifest } from './snapshot.mjs';
 import { verify } from './check-changed.mjs';
 
@@ -78,4 +78,18 @@ test('private execution config rejects changed shell, shim, extras and symlinks'
   await writeFile(path.join(directory,'empty.npmrc'),'');await writeFile(path.join(directory,'bin/yarn'),'changed');await assert.rejects(executionConfiguration(context),/Mutable/);
   await writeFile(path.join(directory,'bin/yarn'),yarnShim(tools));await writeFile(path.join(directory,'bin/node'),'unexpected');await assert.rejects(executionConfiguration(context),/Unexpected private executable/);
   await rm(path.join(directory,'bin/node'));await rm(path.join(directory,'empty.npmrc'));await symlink(path.join(directory,'bin/yarn'),path.join(directory,'empty.npmrc'));await assert.rejects(executionConfiguration(context),/Mutable\/escaped/);
+});
+test('tool probe isolates rc/cache execution and binds the transitive launcher helper',async t=>{
+  const root=await realpath(await mkdtemp(path.join(os.tmpdir(),'portfolio-tool-probe-')));t.after(()=>rm(root,{recursive:true,force:true}));
+  await mkdir(path.join(root,'bin'));await mkdir(path.join(root,'lib'));
+  await writeFile(path.join(root,'package.json'),JSON.stringify({name:'yarn',version:'1.22.22'}));
+  await writeFile(path.join(root,'lib/cli.js'),'synthetic CLI');
+  await writeFile(path.join(root,'lib/v8-compile-cache.js'),'synthetic helper one');
+  const launcher=path.join(root,'bin/yarn.js');
+  await writeFile(launcher,`if (!process.argv.includes('--no-default-rc') || process.env.DISABLE_V8_COMPILE_CACHE !== '1') process.exit(42); console.log('1.22.22');`);
+  const before=await reviewedTools(launcher);
+  await writeFile(path.join(root,'lib/v8-compile-cache.js'),'synthetic helper two');
+  const after=await reviewedTools(launcher);assert.notEqual(before.hashes.compileCache,after.hashes.compileCache);
+  await rm(path.join(root,'lib/v8-compile-cache.js'));await symlink(path.join(root,'..','outside-helper'),path.join(root,'lib/v8-compile-cache.js'));
+  await assert.rejects(reviewedTools(launcher));
 });

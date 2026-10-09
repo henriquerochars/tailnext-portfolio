@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useSyncExternalStore } from "react"
 import { useTheme } from "next-themes"
 import { RiMoonFill, RiSunLine } from "react-icons/ri"
 import { IoMdMenu, IoMdClose } from "react-icons/io"
@@ -27,9 +27,14 @@ const NAV_ITEMS: Array<NavItem> = [
   },
 ]
 
+const subscribeToMount = () => () => {}
+const clientMounted = () => true
+const serverMounted = () => false
+
 export default function Navbar() {
   const { systemTheme, theme, setTheme } = useTheme()
-  const currentTheme = theme === "system" ? systemTheme : theme
+  const mounted = useSyncExternalStore(subscribeToMount, clientMounted, serverMounted)
+  const currentTheme = mounted ? (theme === "system" ? systemTheme : theme) : "light"
   const [navbar, setNavbar] = useState(false)
 
   const scrollToSection = (sectionId: string) => {
@@ -107,6 +112,7 @@ export default function Navbar() {
                 <button
                   type="button"
                   aria-label="Switch to dark theme"
+                  disabled={!mounted}
                   onClick={() => setTheme("dark")}
                   className="bg-slate-300 p-2 rounded-xl"
                 >

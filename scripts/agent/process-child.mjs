@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 let started = false, finishing = false, deadline;
 // The guardian never exits before destroying the group it created. It keeps the
@@ -20,7 +21,11 @@ process.on('message', message => {
   if (message?.type !== 'start' || started) return finish({ code: null, signal: 'invalid-ipc' });
   started = true;
   clearTimeout(deadline);
-  const child = spawn(message.argv[0], message.argv.slice(1), { shell: false, stdio: ['ignore', 'inherit', 'inherit'] });
+  const preload = fileURLToPath(new URL('./process-preload.mjs', import.meta.url));
+  const child = spawn(message.argv[0], message.argv.slice(1), {
+    shell: false, stdio: ['ignore', 'inherit', 'inherit'],
+    env: { ...process.env, NODE_OPTIONS: `--import=${JSON.stringify(preload)}` },
+  });
   child.once('error', error => { console.error(error.message); finish({ code: 127, signal: null }); });
   child.once('exit', (code, signal) => finish({ code, signal }));
   deadline = setTimeout(() => finish({ code: null, signal: 'deadline', timedOut: true }), message.timeoutMs);

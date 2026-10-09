@@ -1,11 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, writeFile, readFile, rm, symlink, realpath } from 'node:fs/promises';
+import { mkdtemp, writeFile, readFile, rm, symlink, realpath, mkdir } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { parseArgs, withLease, atomicJson, childEnvironment } from './bootstrap.mjs';
-import { sourceSnapshot } from './snapshot.mjs';
+import { parseArgs, withLease, atomicJson, childEnvironment, ownedState } from './bootstrap.mjs';
+import { sourceSnapshot, treeManifest, outputManifest } from './snapshot.mjs';
+import { verify } from './check-changed.mjs';
 
 async function fixture(t) {
   const root=await mkdtemp(path.join(os.tmpdir(),'portfolio-snapshot-')); t.after(()=>rm(root,{recursive:true,force:true}));
@@ -46,4 +47,19 @@ test('private JSON rejects symlink escapes and permissive state',async t=>{
 test('minimal execution environment excludes ambient tokens and tool options',()=>{
   const env=childEnvironment({node:'/owned/node',yarn:'/owned/yarn/bin/yarn.js'},'/owned/session',45000);
   assert.equal(env.HARNESS_PORT,'45000');assert.equal(env.NODE_OPTIONS,undefined);assert.equal(env.GITHUB_TOKEN,undefined);assert.equal(env.VERCEL_TOKEN,undefined);
+});
+test('early source preflight failure invalidates a prior passed receipt',async t=>{
+  const {root,sha}=await fixture(t),args={revision:sha,issue:'17',session:'preflight-fixture'};
+  const state=await ownedState(root,args,{create:true,branch:'fixture'});t.after(()=>rm(state.directory,{recursive:true,force:true}));
+  await atomicJson(state.directory,'receipt.json',{version:1,status:'passed'});
+  await writeFile(path.join(root,'source.txt'),'dirty');
+  await assert.rejects(verify(root,args),/Clean reviewed/);
+  assert.equal(JSON.parse(await readFile(path.join(state.directory,'receipt.json'))).status,'failed');
+});
+test('dependency/generated roots and generated files reject external symlinks',async t=>{
+  const root=await realpath(await mkdtemp(path.join(os.tmpdir(),'portfolio-manifest-')));t.after(()=>rm(root,{recursive:true,force:true}));
+  const external=path.join(root,'external');await mkdir(external);await writeFile(path.join(external,'package.json'),'synthetic');
+  await symlink(external,path.join(root,'node_modules'));await assert.rejects(treeManifest(path.join(root,'node_modules')),/Manifest root/);
+  await symlink(external,path.join(root,'.next'));await assert.rejects(outputManifest(root),/Manifest root/);
+  await rm(path.join(root,'.next'));await symlink(path.join(external,'package.json'),path.join(root,'next-env.d.ts'));await assert.rejects(outputManifest(root),/Generated file escapes/);
 });

@@ -56,14 +56,22 @@ export async function treeManifest(root, { missing = false } = {}) {
       else throw new Error(`Unsupported generated file: ${file}`);
     }
   }
-  try { await walk(''); } catch (error) { if (!(missing && error.code === 'ENOENT')) throw error; }
+  try {
+    const stat = await lstat(root);
+    if (!stat.isDirectory() || stat.isSymbolicLink() || await realpath(root) !== root) throw new Error('Manifest root must be an ordinary canonical owned directory');
+    await walk('');
+  } catch (error) { if (!(missing && error.code === 'ENOENT')) throw error; }
   return { count: rows.length, digest: hash(rows) };
 }
 export async function outputManifest(work) {
   const result = {};
   for (const directory of ['.next', 'test-results', 'playwright-report']) result[directory] = await treeManifest(path.join(work, directory), { missing: true });
   for (const file of ['next-env.d.ts', 'tsconfig.tsbuildinfo']) {
-    try { result[file] = hash(await readFile(path.join(work, file))); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+    try {
+      const full = path.join(work, file), stat = await lstat(full);
+      if (!stat.isFile() || stat.isSymbolicLink() || await realpath(full) !== full) throw new Error('Generated file escapes owned storage');
+      result[file] = hash(await readFile(full));
+    } catch (error) { if (error.code !== 'ENOENT') throw error; }
   }
   return result;
 }

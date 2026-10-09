@@ -26,6 +26,7 @@ async function privateDirectory(directory) {
   if (!stat.isDirectory() || stat.isSymbolicLink() || stat.uid !== process.getuid() || (stat.mode & 0o077) || await realpath(directory) !== directory) throw new Error('Unsafe private state directory');
 }
 export async function atomicJson(directory, name, value) {
+  if (!/^[a-z][a-z0-9-]*\.json$/.test(name)) throw new Error('Invalid private record name');
   await privateDirectory(directory);
   const temporary = path.join(directory, `.write-${process.pid}-${Math.random().toString(16).slice(2)}`);
   const handle = await open(temporary, 'wx', 0o600);
@@ -42,6 +43,26 @@ export function childEnvironment(tools, directory, port) {
     PLAYWRIGHT_BROWSERS_PATH: path.join(directory, 'browsers'), HARNESS_YARN: tools.yarn,
     ...(port ? { HARNESS_PORT: String(port), HARNESS_SERVER_OWNED: '1' } : {}) };
 }
+export async function ownedState(root, args, { create = false, branch } = {}) {
+  root = await realpath(root);
+  const parent = path.join(await realpath(os.tmpdir()), `portfolio-harness-${process.getuid()}`);
+  await privateDirectory(parent);
+  const directory = path.join(parent, hash(root));
+  await privateDirectory(directory);
+  const claimPath = path.join(directory, 'claim.json');
+  if (create) {
+    const claim = { version: 1, root, branch, revision: args.revision, issue: args.issue, session: args.session };
+    try {
+      const handle = await open(claimPath, 'wx', 0o600);
+      try { await handle.writeFile(JSON.stringify(claim)); } finally { await handle.close(); }
+    } catch (error) { if (error.code !== 'EEXIST') throw error; }
+  }
+  const stat = await lstat(claimPath);
+  if (!stat.isFile() || stat.isSymbolicLink() || stat.uid !== process.getuid() || (stat.mode & 0o077)) throw new Error('Unsafe claim file');
+  const claim = JSON.parse(await readFile(claimPath));
+  if (claim.version !== 1 || claim.root !== root || claim.revision !== args.revision || claim.issue !== args.issue || claim.session !== args.session) throw new Error('Duplicate worktree ownership; inspect the prior claim explicitly');
+  return { root, args, directory, claim };
+}
 export async function sessionContext(root, args, { create = false } = {}) {
   root = await realpath(root);
   const snapshot = await sourceSnapshot(root, args.revision, args.base ?? null);
@@ -50,21 +71,10 @@ export async function sessionContext(root, args, { create = false } = {}) {
   if (await realpath(loaded) !== root) throw new Error('Run the reviewed harness from its own worktree');
   if ((await readFile(path.join(root, '.node-version'), 'utf8')).trim() !== tools.versions.node
     || JSON.parse(await readFile(path.join(root, 'package.json'))).packageManager !== `yarn@${tools.versions.yarn}`) throw new Error('Runtime pins differ');
-  const parent = path.join(await realpath(os.tmpdir()), `portfolio-harness-${process.getuid()}`);
-  await privateDirectory(parent);
-  // A physical worktree has one claim, regardless of issue/session aliases.
-  const directory = path.join(parent, hash(root));
-  await privateDirectory(directory);
+  const state = await ownedState(root, args, { create, branch: snapshot.branch });
   const claim = { version: 1, root, branch: snapshot.branch, revision: args.revision, issue: args.issue, session: args.session };
-  const claimPath = path.join(directory, 'claim.json');
-  if (create) {
-    try { const handle = await open(claimPath, 'wx', 0o600); await handle.writeFile(JSON.stringify(claim)); await handle.close(); }
-    catch (error) { if (error.code !== 'EEXIST') throw error; }
-  }
-  const stat = await lstat(claimPath);
-  if (!stat.isFile() || stat.isSymbolicLink() || stat.uid !== process.getuid() || (stat.mode & 0o077)) throw new Error('Unsafe claim file');
-  if (JSON.stringify(JSON.parse(await readFile(claimPath))) !== JSON.stringify(claim)) throw new Error('Duplicate worktree ownership; inspect the prior claim explicitly');
-  return { root, args, snapshot, tools, directory, claim };
+  if (JSON.stringify(state.claim) !== JSON.stringify(claim)) throw new Error('Changed worktree branch/claim');
+  return { ...state, snapshot, tools };
 }
 export async function withLease(context, operation) {
   await privateDirectory(context.directory);

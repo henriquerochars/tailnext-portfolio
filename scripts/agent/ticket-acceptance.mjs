@@ -2,7 +2,6 @@ import { readFile } from 'node:fs/promises';
 import { runOwned, requireSuccess } from './process.mjs';
 import { commandVector } from './run-yarn.mjs';
 import { verify } from './check-changed.mjs';
-import { sessionContext, withLease, loadSetup, childEnvironment } from './bootstrap.mjs';
 
 export function parseDoneWhen(body) {
   if (typeof body !== 'string') throw new Error('Acceptance body required');
@@ -43,18 +42,15 @@ export function validateAcceptance(body, commands, gates) {
 export async function executeAcceptance({ body, root, revision, receipt, args }) {
   if (!/^[a-f0-9]{40}$/.test(revision) || receipt?.status !== 'passed' || receipt.source?.head !== revision || Date.now() - receipt.finishedAt > 30 * 60_000) throw new Error('Current revision verification required');
   if (args?.revision !== revision) throw new Error('Current revision/session arguments required');
-  await verify(root, { ...args, reuse: true });
-  const context = await sessionContext(root, args);
-  return withLease(context, async () => {
-    const setup = await loadSetup(context);
-    const commands = JSON.parse(await readFile(`${root}/config/harness/acceptance-commands.json`));
-    const gates = JSON.parse(await readFile(`${root}/config/harness/ci-gates.json`));
+  return verify(root, { ...args, reuse: true }, { consume: async ({ context, setup, env }) => {
+    const commands = JSON.parse(await readFile(`${setup.work}/config/harness/acceptance-commands.json`));
+    const gates = JSON.parse(await readFile(`${setup.work}/config/harness/ci-gates.json`));
     const results = [];
     for (const criterion of validateAcceptance(body, commands, gates)) {
       if (criterion.type !== 'run') { results.push(criterion); continue; }
-      requireSuccess(await runOwned(commandVector(criterion.argv, context.tools), { cwd: setup.work, env: childEnvironment(context.tools, context.directory), timeoutMs: criterion.timeoutSeconds * 1000 }), criterion.text);
+      requireSuccess(await runOwned(commandVector(criterion.argv, context.tools), { cwd: setup.work, env, timeoutMs: criterion.timeoutSeconds * 1000 }), criterion.text);
       results.push({ ...criterion, status: 'passed', revision });
     }
     return results;
-  });
+  } });
 }

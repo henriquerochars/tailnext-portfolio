@@ -20,7 +20,7 @@ test('owned process reports exact command exit and bounded output', async () => 
 });
 test('two independent sessions time out and destroy stubborn descendants', async () => {
   const ports = await Promise.all([freePort(),freePort()]);
-  const runs = ports.map(port => runOwned([process.execPath,'-e',`require('node:child_process').spawn(process.execPath,['-e',${JSON.stringify(listener(port))}],{stdio:'inherit'});setInterval(()=>{},1000)`],{env:environment,timeoutMs:1500}));
+  const runs = ports.map(port => runOwned([process.execPath,'-e',`require('node:child_process').spawn(process.execPath,['-e',${JSON.stringify(listener(port))}],{stdio:'inherit',detached:true});setInterval(()=>{},1000)`],{env:environment,timeoutMs:1500}));
   const results = await Promise.all(runs);
   for (const result of results) { assert.equal(result.timedOut,true); assert.match(result.stdout,/listening/); }
   await Promise.all(ports.map(eventuallyFree));

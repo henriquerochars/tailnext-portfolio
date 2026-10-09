@@ -202,6 +202,23 @@
       ]
     },
     {
+      "id": "browser-cleanup",
+      "job": "validate",
+      "argv": [
+        "node",
+        "scripts/agent/browser-lifecycle.mjs"
+      ],
+      "timeoutSeconds": 90,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": [
+        "reviewed-docs-only"
+      ]
+    },
+    {
       "id": "browser",
       "job": "validate",
       "argv": [
@@ -280,6 +297,23 @@
         "chromium"
       ],
       "timeoutSeconds": 300,
+      "zeroSkips": false,
+      "scope": [
+        "portfolio"
+      ],
+      "revision": "integration",
+      "notApplicableReasons": [
+        "reviewed-docs-only"
+      ]
+    },
+    {
+      "id": "macos-browser-cleanup",
+      "job": "validate-macos",
+      "argv": [
+        "node",
+        "scripts/agent/browser-lifecycle.mjs"
+      ],
+      "timeoutSeconds": 90,
       "zeroSkips": false,
       "scope": [
         "portfolio"

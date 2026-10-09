@@ -1,7 +1,7 @@
 import { readFile, writeFile, lstat, readdir, realpath } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { parseArgs, sessionContext, ownedState, withLease, loadSetup, childEnvironment, atomicJson } from './bootstrap.mjs';
+import { parseArgs, sessionContext, ownedState, withLease, loadSetup, childEnvironment, atomicJson, executionConfiguration } from './bootstrap.mjs';
 import { sourceSnapshot, hash, outputManifest, treeManifest } from './snapshot.mjs';
 import { reviewedTools, commandVector } from './run-yarn.mjs';
 import { selectGates, assertNoSkippedTests, validateRegistry } from './ci-contract.mjs';
@@ -79,7 +79,7 @@ export async function verify(root, args, { consume } = {}) {
     const port = 40000 + Number.parseInt(hash(context.claim).slice(0, 6), 16) % 20000;
     const env = childEnvironment(context.tools, context.directory, port);
     fingerprint = hash({ snapshot: context.snapshot, claim: context.claim, tools: context.tools, work: setup.work,
-      dependencies: setup.dependencies, registry, env, platform: process.platform, arch: process.arch });
+      dependencies: setup.dependencies, configuration: setup.configuration, registry, env, platform: process.platform, arch: process.arch });
     await assertArchiveUnchanged(context, setup);
     if (args.reuse) {
       const outputs = await outputManifest(setup.work);
@@ -92,6 +92,7 @@ export async function verify(root, args, { consume } = {}) {
         if (JSON.stringify(await sourceSnapshot(root, args.revision, args.base ?? null)) !== JSON.stringify(context.snapshot)
           || JSON.stringify(await reviewedTools()) !== JSON.stringify(context.tools)
           || JSON.stringify(await treeManifest(path.join(setup.work, 'node_modules'))) !== JSON.stringify(setup.dependencies)
+          || JSON.stringify(await executionConfiguration(context)) !== JSON.stringify(setup.configuration)
           || JSON.stringify(await outputManifest(setup.work)) !== JSON.stringify(outputs)) throw new Error('Acceptance inputs/outputs changed during execution');
         await assertArchiveUnchanged(context, setup);
       await atomicJson(context.directory, 'receipt.json', previous);
@@ -103,7 +104,8 @@ export async function verify(root, args, { consume } = {}) {
       if (Date.now() - startedAt > MAX_RUN) throw new Error('Aggregate verification deadline exceeded');
       if (JSON.stringify(await sourceSnapshot(root, args.revision, args.base ?? null)) !== JSON.stringify(context.snapshot)
         || JSON.stringify(await reviewedTools()) !== JSON.stringify(context.tools)
-        || JSON.stringify(await treeManifest(path.join(setup.work, 'node_modules'))) !== JSON.stringify(setup.dependencies)) throw new Error('Verification inputs changed during execution');
+        || JSON.stringify(await treeManifest(path.join(setup.work, 'node_modules'))) !== JSON.stringify(setup.dependencies)
+        || JSON.stringify(await executionConfiguration(context)) !== JSON.stringify(setup.configuration)) throw new Error('Verification inputs changed during execution');
       await assertArchiveUnchanged(context, setup);
       const receipt = { version: 1, status: 'passed', fingerprint, source: context.snapshot, tools: context.tools.versions,
         startedAt, finishedAt: Date.now(), gates: completed, outputs: await outputManifest(setup.work) };

@@ -4,7 +4,8 @@ import { mkdtemp, writeFile, readFile, rm, symlink, realpath, mkdir } from 'node
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { parseArgs, withLease, atomicJson, childEnvironment, ownedState, setup } from './bootstrap.mjs';
+import { parseArgs, withLease, atomicJson, childEnvironment, ownedState, setup, executionConfiguration, yarnShim } from './bootstrap.mjs';
+import { commandVector } from './run-yarn.mjs';
 import { sourceSnapshot, treeManifest, outputManifest } from './snapshot.mjs';
 import { verify } from './check-changed.mjs';
 
@@ -65,4 +66,16 @@ test('dependency/generated roots and generated files reject external symlinks',a
   await symlink(external,path.join(root,'node_modules'));await assert.rejects(treeManifest(path.join(root,'node_modules')),/Manifest root/);
   await symlink(external,path.join(root,'.next'));await assert.rejects(outputManifest(root),/Manifest root/);
   await rm(path.join(root,'.next'));await symlink(path.join(external,'package.json'),path.join(root,'next-env.d.ts'));await assert.rejects(outputManifest(root),/Generated file escapes/);
+});
+test('private execution config rejects changed shell, shim, extras and symlinks',async t=>{
+  const directory=await realpath(await mkdtemp(path.join(os.tmpdir(),'portfolio-execution-config-')));t.after(()=>rm(directory,{recursive:true,force:true}));
+  await mkdir(path.join(directory,'bin'),{mode:0o700});
+  const tools={node:'/owned/node',yarn:'/owned/yarn/bin/yarn.js'},context={directory,tools};
+  await writeFile(path.join(directory,'empty.npmrc'),'',{mode:0o600});await writeFile(path.join(directory,'bin/yarn'),yarnShim(tools),{mode:0o700});
+  const before=await executionConfiguration(context);assert.equal(before['empty.npmrc'].digest.length,64);
+  assert.deepEqual(commandVector(['yarn','build'],tools),['/owned/node','/owned/yarn/bin/yarn.js','--no-default-rc','build']);
+  await writeFile(path.join(directory,'empty.npmrc'),'script-shell=/synthetic/changed-shell');await assert.rejects(executionConfiguration(context),/Mutable/);
+  await writeFile(path.join(directory,'empty.npmrc'),'');await writeFile(path.join(directory,'bin/yarn'),'changed');await assert.rejects(executionConfiguration(context),/Mutable/);
+  await writeFile(path.join(directory,'bin/yarn'),yarnShim(tools));await writeFile(path.join(directory,'bin/node'),'unexpected');await assert.rejects(executionConfiguration(context),/Unexpected private executable/);
+  await rm(path.join(directory,'bin/node'));await rm(path.join(directory,'empty.npmrc'));await symlink(path.join(directory,'bin/yarn'),path.join(directory,'empty.npmrc'));await assert.rejects(executionConfiguration(context),/Mutable\/escaped/);
 });

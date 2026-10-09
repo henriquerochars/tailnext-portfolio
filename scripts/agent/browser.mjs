@@ -34,7 +34,7 @@ export async function productionBrowser({ work, tools, env, port, timeoutMs = 18
     }
     if (!ready || !healthy || ended) throw new Error(`Owned production server did not become ready: ${log}`);
     if (Date.now() >= deadline) throw new Error('Production browser deadline exceeded');
-    const result = requireSuccess(await runOwned([tools.node, tools.yarn, 'test:e2e:ci'], { cwd: work, env, timeoutMs: deadline - Date.now() }), 'Production browser');
+    const result = requireSuccess(await runOwned([tools.node, tools.yarn, '--no-default-rc', 'test:e2e:ci'], { cwd: work, env, timeoutMs: deadline - Date.now() }), 'Production browser');
     if (ended) throw new Error('Production server exited before browser verification finished');
     return { ...result, server: server.identity, port };
   } finally {

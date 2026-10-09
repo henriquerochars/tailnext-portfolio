@@ -24,6 +24,6 @@ export async function reviewedTools(launcher = process.env.HARNESS_YARN ?? proce
 }
 export function commandVector(argv, tools) {
   if (argv[0] === 'node') return [tools.node, ...argv.slice(1)];
-  if (argv[0] === 'yarn') return [tools.node, tools.yarn, ...argv.slice(1)];
+  if (argv[0] === 'yarn') return [tools.node, tools.yarn, '--no-default-rc', ...argv.slice(1)];
   throw new Error('Unreviewed executable');
 }

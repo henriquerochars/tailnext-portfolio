@@ -1,6 +1,7 @@
-import { mkdir, mkdtemp, realpath, lstat, readFile, writeFile, open, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, realpath, lstat, readFile, writeFile, open, rm, readdir } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
+import { constants } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -42,6 +43,32 @@ export function childEnvironment(tools, directory, port) {
     npm_config_userconfig: path.join(directory, 'empty.npmrc'), npm_config_globalconfig: path.join(directory, 'empty.npmrc'),
     PLAYWRIGHT_BROWSERS_PATH: path.join(directory, 'browsers'), HARNESS_YARN: tools.yarn,
     ...(port ? { HARNESS_PORT: String(port), HARNESS_SERVER_OWNED: '1' } : {}) };
+}
+export function yarnShim(tools) {
+  return `#!/bin/sh\nexec '${tools.node.replaceAll("'", "'\\''")}' '${tools.yarn.replaceAll("'", "'\\''")}' --no-default-rc "$@"\n`;
+}
+async function writePrivateFile(directory, file, text, mode) {
+  const handle = await open(path.join(directory,file), constants.O_WRONLY | constants.O_CREAT | constants.O_NOFOLLOW, mode);
+  try {
+    const stat = await handle.stat();
+    if (!stat.isFile() || stat.uid !== process.getuid() || stat.nlink !== 1 || (stat.mode & 0o777) !== mode) throw new Error('Unsafe private execution file');
+    await handle.truncate(0); await handle.writeFile(text);
+  } finally { await handle.close(); }
+}
+export async function executionConfiguration(context) {
+  const { directory, tools } = context;
+  await privateDirectory(path.join(directory, 'bin'));
+  if (JSON.stringify(await readdir(path.join(directory,'bin'))) !== JSON.stringify(['yarn'])) throw new Error('Unexpected private executable');
+  const result = {};
+  for (const [file, expected, mode] of [['empty.npmrc', '', 0o600], ['bin/yarn', yarnShim(tools), 0o700]]) {
+    const full = path.join(directory,file), stat = await lstat(full);
+    if (!stat.isFile() || stat.isSymbolicLink() || await realpath(full) !== full || stat.uid !== process.getuid()
+      || stat.nlink !== 1 || (stat.mode & 0o777) !== mode) throw new Error(`Mutable/escaped execution configuration: ${file}`);
+    const bytes = await readFile(full);
+    if (bytes.toString('utf8') !== expected) throw new Error(`Mutable/escaped execution configuration: ${file}`);
+    result[file] = { digest: hash(bytes), mode };
+  }
+  return result;
 }
 export async function ownedState(root, args, { create = false, branch } = {}) {
   root = await realpath(root);
@@ -101,9 +128,10 @@ export async function prepare(context) {
   execFileSync('tar', ['-xf', archive, '-C', work], { timeout: 20_000 });
   await rm(archive);
   for (const name of ['home', 'tmp', 'cache', 'bin', 'browsers']) await privateDirectory(path.join(directory, name));
-  await writeFile(path.join(directory, 'empty.npmrc'), '', { mode: 0o600 });
+  await writePrivateFile(directory, 'empty.npmrc', '', 0o600);
   // Yarn scripts resolve the reviewed launcher through this private shim.
-  await writeFile(path.join(directory, 'bin/yarn'), `#!/bin/sh\nexec '${tools.node.replaceAll("'", "'\\''")}' '${tools.yarn.replaceAll("'", "'\\''")}' "$@"\n`, { mode: 0o700 });
+  await writePrivateFile(directory, 'bin/yarn', yarnShim(tools), 0o700);
+  const configuration = await executionConfiguration(context);
   const env = childEnvironment(tools, directory);
   const install = requireSuccess(await runOwned(commandVector(['yarn', 'install', '--frozen-lockfile', '--ignore-scripts', '--non-interactive', '--production=false'], tools), {
     cwd: work, env, timeoutMs: 480_000,
@@ -111,7 +139,8 @@ export async function prepare(context) {
   await writeFile(path.join(directory, 'install.log'), `${install.stdout}\n${install.stderr}`, { mode: 0o600 });
   if (hash(await readFile(path.join(work, 'yarn.lock'))) !== context.snapshot.lock) throw new Error('Frozen installation changed lockfile');
   const dependencies = await treeManifest(path.join(work, 'node_modules'));
-  const setup = { version: 1, claim: context.claim, tools, work, dependencies, source: context.snapshot.files, lock: context.snapshot.lock, installDurationMs: Date.now() - startedAt };
+  if (JSON.stringify(await executionConfiguration(context)) !== JSON.stringify(configuration)) throw new Error('Execution configuration changed during install');
+  const setup = { version: 1, claim: context.claim, tools, work, dependencies, configuration, source: context.snapshot.files, lock: context.snapshot.lock, installDurationMs: Date.now() - startedAt };
   await atomicJson(directory, 'setup.json', setup);
   return setup;
 }
@@ -125,6 +154,7 @@ export async function loadSetup(context) {
     || !Number.isInteger(setup.installDurationMs) || setup.installDurationMs < 0 || setup.installDurationMs > 1_200_000
     || await realpath(setup.work) !== setup.work || !(await realpath(setup.work)).startsWith(`${context.directory}${path.sep}`)) throw new Error('Stale/escaped setup; run setup again');
   if (JSON.stringify(await treeManifest(path.join(setup.work, 'node_modules'))) !== JSON.stringify(setup.dependencies)) throw new Error('Installed dependency bytes changed');
+  if (JSON.stringify(await executionConfiguration(context)) !== JSON.stringify(setup.configuration)) throw new Error('Execution configuration changed');
   return setup;
 }
 export async function setup(root, args) {
@@ -135,6 +165,7 @@ export async function setup(root, args) {
       const context = await sessionContext(root, args);
       await prepare(context);
       if (JSON.stringify(await sourceSnapshot(context.root, args.revision, args.base ?? null)) !== JSON.stringify(context.snapshot)) throw new Error('Source changed during setup');
+      if (JSON.stringify(await reviewedTools()) !== JSON.stringify(context.tools)) throw new Error('Tools changed during setup');
       } catch (error) {
         await atomicJson(state.directory, 'receipt.json', { version: 1, status: 'failed', reason: 'setup-failed', error: error.message.slice(0,8192) });
         throw error;

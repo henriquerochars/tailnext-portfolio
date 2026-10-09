@@ -1,18 +1,63 @@
-# Tailwind CSS and Next.js Portfolio
+# Henrique Rocha Dev Portfolio
 
-This is a template for creating a portfolio with Tailwind CSS and Next.js.
+Personal portfolio for Henrique Rocha Serrano, built with Next.js and deployed on Vercel.
 
-![Portfolio Demo](demo/demo.gif)
+## Stack
 
-## How it works
+- Next.js 16
+- React 19
+- TypeScript 5.9
+- Tailwind CSS 4
+- next-themes
+- Vercel
 
-Fork or download the repo and change whatever you need to change for your needs.
+## Requirements
 
-## Running Locally
+- Node.js 24.x
+- Yarn 1.22.22
 
-Can run the application in VS Code or a terminal and it will be available at `http://localhost:3000`.
+If you use `nvm`:
 
 ```bash
-npm install
-npm run dev
+nvm use
 ```
+
+## Local development
+
+Install dependencies from the committed lockfile:
+
+```bash
+yarn install --frozen-lockfile
+```
+
+Start the development server:
+
+```bash
+yarn dev
+```
+
+Open `http://localhost:3000`.
+
+## Quality checks
+
+Run the same checks enforced by CI:
+
+```bash
+yarn typecheck
+yarn lint
+yarn build
+```
+
+## Production
+
+Start a previously built production bundle with:
+
+```bash
+yarn start
+```
+
+The production site is deployed on Vercel at:
+
+- https://henriquerochadev.vercel.app
+
+The Node.js runtime is declared in `package.json` through `engines.node`.

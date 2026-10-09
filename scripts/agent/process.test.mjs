@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import net from 'node:net';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
+import { mkdtemp, cp, rm, realpath, writeFile } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import { runOwned, startOwnedProcess, requireSuccess } from './process.mjs';
 import { assertFreePort } from './browser.mjs';
 
@@ -42,4 +45,32 @@ test('foreign listener collision fails and leaves it serving', async () => {
   server.listen(0,'127.0.0.1'); await once(server,'listening');
   try { await assert.rejects(assertFreePort(server.address().port),/foreign listener/); assert.equal(server.listening,true); }
   finally { await new Promise(resolve=>server.close(resolve)); }
+});
+test('reviewed archive copies can supervise their own nested process group',async t=>{
+  const directory=await realpath(await mkdtemp(path.join(os.tmpdir(),'portfolio-guardian-copy-')));t.after(()=>rm(directory,{recursive:true,force:true}));
+  for(const file of ['process.mjs','process-child.mjs','process-preload.mjs']) await cp(new URL(file,import.meta.url),path.join(directory,file));
+  const moduleUrl=new URL(`file://${directory}/process.mjs`).href;
+  const code=`import {runOwned} from ${JSON.stringify(moduleUrl)};const result=await runOwned([process.execPath,'-e','setInterval(()=>{},1000)'],{timeoutMs:300});if(!result.timedOut)process.exit(2);console.log('archive-clean');`;
+  const result=await runOwned([process.execPath,'--input-type=module','-e',code],{env:environment,timeoutMs:3000});
+  assert.equal(result.timedOut,false);assert.equal(result.code,0);assert.match(result.stdout,/archive-clean/);
+});
+test('an explicit minimal child environment retains reviewed grandchild supervision',async()=>{
+  const port=await freePort();
+  const child=`require('node:child_process').spawn(process.execPath,['-e',${JSON.stringify(listener(port))}],{detached:true,stdio:'inherit'});setInterval(()=>{},1000);`;
+  const parent=`require('node:child_process').spawn(process.execPath,['-e',${JSON.stringify(child)}],{env:{PATH:process.env.PATH},stdio:'inherit'});setInterval(()=>{},1000);`;
+  const result=await runOwned([process.execPath,'-e',parent],{env:environment,timeoutMs:1500});
+  assert.equal(result.timedOut,true);assert.match(result.stdout,/listening/);await eventuallyFree(port);
+});
+test('preload preserves sync, callback, undefined args and fork option overloads',async t=>{
+  const directory=await realpath(await mkdtemp(path.join(os.tmpdir(),'portfolio-overloads-')));t.after(()=>rm(directory,{recursive:true,force:true}));
+  const forkFile=path.join(directory,'fork.cjs');await writeFile(forkFile,'process.send(process.env.MARKER);process.disconnect();');
+  const code=`import assert from 'node:assert/strict';import cp from 'node:child_process';
+const env={PATH:process.env.PATH,MARKER:'kept'};
+const result=cp.spawnSync(process.execPath,undefined,{input:'process.stdout.write(process.env.MARKER)',encoding:'utf8',env});assert.equal(result.stdout,'kept');
+const output=cp.execFileSync(process.execPath,undefined,{input:'process.stdout.write(process.env.MARKER)',encoding:'utf8',env});assert.equal(output,'kept');
+await new Promise((resolve,reject)=>cp.execFile(process.execPath,['-e','process.stdout.write(process.env.MARKER)'],{encoding:'utf8',env},(error,stdout)=>{if(error)return reject(error);assert.equal(stdout,'kept');resolve();}));
+await new Promise((resolve,reject)=>{const child=cp.fork(${JSON.stringify(forkFile)},undefined,{env,silent:true,execArgv:[]});child.once('message',message=>{assert.equal(message,'kept');resolve();});child.once('error',reject);});
+console.log('overloads-kept');`;
+  const result=await runOwned([process.execPath,'--input-type=module','-e',code],{env:environment,timeoutMs:5000});
+  assert.equal(requireSuccess(result,'overloads').stdout.trim(),'overloads-kept');
 });

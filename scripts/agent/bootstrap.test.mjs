@@ -4,7 +4,7 @@ import { mkdtemp, writeFile, readFile, rm, symlink, realpath, mkdir } from 'node
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { parseArgs, withLease, atomicJson, childEnvironment, ownedState } from './bootstrap.mjs';
+import { parseArgs, withLease, atomicJson, childEnvironment, ownedState, setup } from './bootstrap.mjs';
 import { sourceSnapshot, treeManifest, outputManifest } from './snapshot.mjs';
 import { verify } from './check-changed.mjs';
 
@@ -54,6 +54,9 @@ test('early source preflight failure invalidates a prior passed receipt',async t
   await atomicJson(state.directory,'receipt.json',{version:1,status:'passed'});
   await writeFile(path.join(root,'source.txt'),'dirty');
   await assert.rejects(verify(root,args),/Clean reviewed/);
+  assert.equal(JSON.parse(await readFile(path.join(state.directory,'receipt.json'))).status,'failed');
+  await atomicJson(state.directory,'receipt.json',{version:1,status:'passed'});
+  await assert.rejects(setup(root,args),/Clean reviewed/);
   assert.equal(JSON.parse(await readFile(path.join(state.directory,'receipt.json'))).status,'failed');
 });
 test('dependency/generated roots and generated files reject external symlinks',async t=>{

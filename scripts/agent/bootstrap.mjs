@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { hash, sourceSnapshot, treeManifest } from './snapshot.mjs';
+import { hash, git, sourceSnapshot, treeManifest } from './snapshot.mjs';
 import { reviewedTools, commandVector } from './run-yarn.mjs';
 import { runOwned, requireSuccess } from './process.mjs';
 
@@ -127,15 +127,23 @@ export async function loadSetup(context) {
   if (JSON.stringify(await treeManifest(path.join(setup.work, 'node_modules'))) !== JSON.stringify(setup.dependencies)) throw new Error('Installed dependency bytes changed');
   return setup;
 }
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-  try {
-    const args = parseArgs(process.argv.slice(2));
-    const context = await sessionContext(process.cwd(), args, { create: true });
-    await withLease(context, async () => {
-      await atomicJson(context.directory, 'receipt.json', { version: 1, status: 'incomplete', reason: 'setup-started' });
+export async function setup(root, args) {
+    const state = await ownedState(root, args, { create: true, branch: git(root, 'symbolic-ref', '--quiet', '--short', 'HEAD').trim() });
+    await withLease(state, async () => {
+      await atomicJson(state.directory, 'receipt.json', { version: 1, status: 'incomplete', reason: 'setup-started' });
+      try {
+      const context = await sessionContext(root, args);
       await prepare(context);
-      await sourceSnapshot(context.root, args.revision, args.base ?? null);
+      if (JSON.stringify(await sourceSnapshot(context.root, args.revision, args.base ?? null)) !== JSON.stringify(context.snapshot)) throw new Error('Source changed during setup');
+      } catch (error) {
+        await atomicJson(state.directory, 'receipt.json', { version: 1, status: 'failed', reason: 'setup-failed', error: error.message.slice(0,8192) });
+        throw error;
+      }
     });
     console.log(`Reviewed setup ready in private storage (${args.session}); verification remains pending.`);
+}
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  try {
+    await setup(process.cwd(), parseArgs(process.argv.slice(2)));
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

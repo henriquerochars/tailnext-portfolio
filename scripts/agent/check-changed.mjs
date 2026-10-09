@@ -88,12 +88,12 @@ export async function verify(root, args, { consume } = {}) {
       if (consume) {
         // Acceptance consumes the exact verified installation under this lease.
         consumed = await consume({ context, setup, env });
+      }
         if (JSON.stringify(await sourceSnapshot(root, args.revision, args.base ?? null)) !== JSON.stringify(context.snapshot)
           || JSON.stringify(await reviewedTools()) !== JSON.stringify(context.tools)
           || JSON.stringify(await treeManifest(path.join(setup.work, 'node_modules'))) !== JSON.stringify(setup.dependencies)
           || JSON.stringify(await outputManifest(setup.work)) !== JSON.stringify(outputs)) throw new Error('Acceptance inputs/outputs changed during execution');
         await assertArchiveUnchanged(context, setup);
-      }
       await atomicJson(context.directory, 'receipt.json', previous);
       console.log('Explicit fresh receipt reuse passed.'); return consume ? consumed : previous;
     }

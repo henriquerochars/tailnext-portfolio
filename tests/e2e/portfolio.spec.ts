@@ -44,10 +44,10 @@ test.describe("portfolio smoke coverage", () => {
   test("navigates between Home and About", async ({ page }) => {
     await page.goto("/")
 
-    await page.getByRole("button", { name: "About", exact: true }).click()
+    await page.getByRole("link", { name: "About", exact: true }).click()
     await expect(page.locator("#about")).toBeInViewport()
 
-    await page.getByRole("button", { name: "Home", exact: true }).click()
+    await page.getByRole("link", { name: "Home", exact: true }).click()
     await expect(page.locator("#home")).toBeInViewport()
   })
 
@@ -95,26 +95,35 @@ test.describe("portfolio smoke coverage", () => {
 
     await page.getByRole("button", { name: "Open navigation menu" }).click()
     await expect(page.getByRole("button", { name: "Close navigation menu" })).toBeVisible()
-    await expect(page.getByRole("button", { name: "About", exact: true })).toBeVisible()
+    await expect(page.getByRole("link", { name: "About", exact: true })).toBeVisible()
 
-    await page.getByRole("button", { name: "About", exact: true }).click()
+    await page.getByRole("link", { name: "About", exact: true }).click()
     await expect(page.locator("#about")).toBeInViewport()
     await expect(page.getByRole("button", { name: "Open navigation menu" })).toBeVisible()
   })
 
   test("supports keyboard navigation and theme controls", async ({ page }) => {
     await page.goto("/")
-    const about = page.getByRole("button", { name: "About", exact: true })
+    const about = page.getByRole("link", { name: "About", exact: true })
     for (let i = 0; i < 12 && !(await about.evaluate(element => element === document.activeElement)); i++) await page.keyboard.press("Tab")
     await expect(about).toBeFocused()
-    await page.keyboard.press("Enter")
-    await expect(page.locator("#about")).toBeInViewport()
+    // Check header order before native fragment navigation changes the tab starting point.
+    for (const name of ["Experience", "Education", "Blog pt-br"]) {
+      await page.keyboard.press("Tab")
+      await expect(page.getByRole("link", { name, exact: true })).toBeFocused()
+    }
     const theme = page.getByRole("button", { name: /Switch to (dark|light) theme/ })
     const previous = await theme.getAttribute("aria-label")
-    for (let i = 0; i < 12 && !(await theme.evaluate(element => element === document.activeElement)); i++) await page.keyboard.press("Tab")
+    await page.keyboard.press("Tab")
     await expect(theme).toBeFocused()
     await page.keyboard.press("Space")
     await expect(theme).not.toHaveAttribute("aria-label", previous!)
+    for (const name of ["Blog pt-br", "Education", "Experience", "About"]) {
+      await page.keyboard.press("Shift+Tab")
+      await expect(page.getByRole("link", { name, exact: true })).toBeFocused()
+    }
+    await page.keyboard.press("Enter")
+    await expect(page.locator("#about")).toBeInViewport()
   })
 
   for (const width of [360, 1440]) {

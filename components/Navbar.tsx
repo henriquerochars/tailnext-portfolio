@@ -1,31 +1,17 @@
 "use client"
 
-import { useState, useSyncExternalStore } from "react"
+import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { useTheme } from "next-themes"
 import { RiMoonFill, RiSunLine } from "react-icons/ri"
 import { IoMdMenu, IoMdClose } from "react-icons/io"
 import { publicLinks } from "@/data/public-profile"
 
-interface NavItem {
-  label: string
-  page: string
-  external?: boolean
-}
-
-const NAV_ITEMS: Array<NavItem> = [
-  {
-    label: "Home",
-    page: "home",
-  },
-  {
-    label: "About",
-    page: "about",
-  },
-  {
-    label: "Blog pt-br",
-    page: publicLinks.blog,
-    external: true,
-  },
+const NAV_ITEMS = [
+  { label: "Home", href: "#home" },
+  { label: "About", href: "#about" },
+  { label: "Experience", href: "#experience" },
+  { label: "Education", href: "#education" },
+  { label: "Blog pt-br", href: publicLinks.blog, external: true },
 ]
 
 const subscribeToMount = () => () => {}
@@ -37,92 +23,70 @@ export default function Navbar() {
   const mounted = useSyncExternalStore(subscribeToMount, clientMounted, serverMounted)
   const currentTheme = mounted ? (theme === "system" ? systemTheme : theme) : "light"
   const [navbar, setNavbar] = useState(false)
+  const menuButton = useRef<HTMLButtonElement>(null)
 
-  const scrollToSection = (sectionId: string) => {
-    document.getElementById(sectionId)?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    })
-    setNavbar(false)
-  }
+  useEffect(() => {
+    if (!navbar) return
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return
+      setNavbar(false)
+      if (menuButton.current?.getClientRects().length) menuButton.current.focus()
+    }
+    document.addEventListener("keydown", closeOnEscape)
+    return () => document.removeEventListener("keydown", closeOnEscape)
+  }, [navbar])
 
   return (
-    <header className="w-full mx-auto px-4 sm:px-20 fixed top-0 z-50 shadow bg-white dark:bg-stone-900 dark:border-b dark:border-stone-600">
-      <div className="justify-between md:items-center md:flex">
-        <div>
-          <div className="flex items-center justify-between py-3 md:py-5 md:block">
-            <button
-              type="button"
-              onClick={() => scrollToSection("home")}
-              className="container flex items-center space-x-2"
-            >
-              <h2 className="text-2xl font-bold">Henrique Rocha Dev</h2>
-            </button>
-            <div className="md:hidden">
+    <header className="fixed top-0 z-50 w-full bg-white px-4 shadow sm:px-6 lg:px-8 dark:border-b dark:border-stone-600 dark:bg-stone-900">
+      <div className="lg:flex lg:items-center lg:justify-between lg:gap-6">
+        <div className="flex items-center justify-between gap-3 py-3 lg:py-5">
+          <a href="#home" onClick={() => setNavbar(false)} className="text-2xl font-bold">
+            Henrique Rocha Dev
+          </a>
+          <button
+            ref={menuButton}
+            type="button"
+            aria-label={navbar ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={navbar}
+            aria-controls="primary-navigation"
+            className="shrink-0 rounded-md p-2 text-stone-700 lg:hidden dark:text-stone-200"
+            onClick={() => setNavbar(open => !open)}
+          >
+            {navbar ? <IoMdClose size={30} /> : <IoMdMenu size={30} />}
+          </button>
+        </div>
+        <nav
+          id="primary-navigation"
+          aria-label="Main navigation"
+          className={`max-h-[calc(100dvh-5rem)] overflow-y-auto pb-3 lg:block lg:overflow-visible lg:pb-0 ${navbar ? "block" : "hidden"}`}
+        >
+          <ul className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
+            {NAV_ITEMS.map(item => (
+              <li key={item.href}>
+                <a
+                  href={item.href}
+                  target={item.external ? "_blank" : undefined}
+                  rel={item.external ? "noopener noreferrer" : undefined}
+                  onClick={() => setNavbar(false)}
+                  className="flex min-h-11 items-center text-neutral-900 hover:text-neutral-500 dark:text-neutral-100"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+            <li>
               <button
                 type="button"
-                aria-label={navbar ? "Close navigation menu" : "Open navigation menu"}
-                className="p-2 text-gray-700 rounded-md outline-none focus:border-gray-400 focus:border"
-                onClick={() => setNavbar(!navbar)}
+                aria-label={currentTheme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+                disabled={!mounted}
+                onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
+                className="flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-slate-300 p-2 text-black"
               >
-                {navbar ? <IoMdClose size={30} /> : <IoMdMenu size={30} />}
+                {currentTheme === "dark" ? <RiSunLine size={25} /> : <RiMoonFill size={25} />}
               </button>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div
-            className={`flex-1 justify-self-center pb-3 mt-8 md:block md:pb-0 md:mt-0 ${
-              navbar ? "block" : "hidden"
-            }`}
-          >
-            <div className="items-center justify-center space-y-8 md:flex md:space-x-6 md:space-y-0">
-              {NAV_ITEMS.map((item) =>
-                item.external ? (
-                  <a
-                    href={item.page}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    key={item.label}
-                    className="cursor-pointer block lg:inline-block text-neutral-900 hover:text-neutral-500 dark:text-neutral-100"
-                  >
-                    {item.label}
-                  </a>
-                ) : (
-                  <button
-                    type="button"
-                    key={item.label}
-                    onClick={() => scrollToSection(item.page)}
-                    className="cursor-pointer block lg:inline-block text-neutral-900 hover:text-neutral-500 dark:text-neutral-100"
-                  >
-                    {item.label}
-                  </button>
-                )
-              )}
-              {currentTheme === "dark" ? (
-                <button
-                  type="button"
-                  aria-label="Switch to light theme"
-                  onClick={() => setTheme("light")}
-                  className="bg-slate-300 p-2 rounded-xl"
-                >
-                  <RiSunLine size={25} color="black" />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  aria-label="Switch to dark theme"
-                  disabled={!mounted}
-                  onClick={() => setTheme("dark")}
-                  className="bg-slate-300 p-2 rounded-xl"
-                >
-                  <RiMoonFill size={25} />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+            </li>
+          </ul>
+        </nav>
       </div>
     </header>
   )

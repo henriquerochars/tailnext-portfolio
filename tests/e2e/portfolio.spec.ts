@@ -116,9 +116,8 @@ test("supports skip navigation, keyboard links and the theme selector", async ({
   const theme = themeControl(page)
   await expect(theme).toBeFocused()
   expect(await theme.evaluate(element => getComputedStyle(element).outlineStyle)).not.toBe("none")
-  await page.keyboard.press("Space")
-  await page.keyboard.press("ArrowUp")
-  await page.keyboard.press("ArrowUp")
+  // Native select type-ahead works in both macOS and Linux headless Chromium.
+  await page.keyboard.press("l")
   await page.keyboard.press("Enter")
   await expect(theme).toHaveValue("light")
   await expect(page.locator("html")).toHaveClass(/light/)

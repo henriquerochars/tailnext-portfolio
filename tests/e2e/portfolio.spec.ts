@@ -107,14 +107,23 @@ test.describe("portfolio smoke coverage", () => {
     const about = page.getByRole("link", { name: "About", exact: true })
     for (let i = 0; i < 12 && !(await about.evaluate(element => element === document.activeElement)); i++) await page.keyboard.press("Tab")
     await expect(about).toBeFocused()
-    await page.keyboard.press("Enter")
-    await expect(page.locator("#about")).toBeInViewport()
+    // Check header order before native fragment navigation changes the tab starting point.
+    for (const name of ["Experience", "Education", "Blog"]) {
+      await page.keyboard.press("Tab")
+      await expect(page.getByRole("link", { name, exact: true })).toBeFocused()
+    }
     const theme = page.getByRole("button", { name: /Switch to (dark|light) theme/ })
     const previous = await theme.getAttribute("aria-label")
-    for (let i = 0; i < 12 && !(await theme.evaluate(element => element === document.activeElement)); i++) await page.keyboard.press("Tab")
+    await page.keyboard.press("Tab")
     await expect(theme).toBeFocused()
     await page.keyboard.press("Space")
     await expect(theme).not.toHaveAttribute("aria-label", previous!)
+    for (const name of ["Blog", "Education", "Experience", "About"]) {
+      await page.keyboard.press("Shift+Tab")
+      await expect(page.getByRole("link", { name, exact: true })).toBeFocused()
+    }
+    await page.keyboard.press("Enter")
+    await expect(page.locator("#about")).toBeInViewport()
   })
 
   for (const width of [360, 1440]) {

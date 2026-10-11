@@ -1,17 +1,8 @@
-"use client"
-
 import Image from "next/image"
 import { HiArrowDown } from "react-icons/hi"
 import { profileIntroduction } from "@/data/public-profile"
 
 const HeroSection = () => {
-  const scrollToAbout = () => {
-    document.getElementById("about")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    })
-  }
-
   return (
     <section id="home">
       <div className="flex flex-col text-center items-center justify-center my-10 py-16 sm:py-32 md:py-48 md:flex-row md:space-x-4 md:text-left">
@@ -39,14 +30,13 @@ const HeroSection = () => {
         </div>
       </div>
       <div className="flex flex-row items-center justify-center text-center">
-        <button
-          type="button"
-          onClick={scrollToAbout}
+        <a
+          href="#about"
           aria-label="Scroll to About section"
           className="cursor-pointer"
         >
-          <HiArrowDown size={35} className="animate-bounce" />
-        </button>
+          <HiArrowDown size={35} className="motion-safe:animate-bounce" />
+        </a>
       </div>
     </section>
   )

@@ -8,7 +8,9 @@ Source: Owner-selected on-request workflow; rendered LinkedIn profile inspected 
 
 The [LinkedIn profile](https://www.linkedin.com/in/henriquerochaserrano/) is the professional factual source. Update the portfolio when the owner asks for a refresh. Read the rendered profile through the browser and commit reviewed content; the public site renders repository data without contacting LinkedIn.
 
-`data/public-profile.ts` holds public copy and destinations used by interactive components. `data/profile.ts` holds the complete typed career, normalized global skill catalog, original source labels, top skills, curated visible skills and per-entry associations. Keep the complete career catalog out of client imports. Experience/Education UI belongs to #20 and the redesign belongs to #21.
+`data/public-profile.ts` holds public copy and destinations used by interactive components. `data/profile.ts` holds the complete typed career, normalized global skill catalog, original source labels, top skills, curated visible skills and per-entry associations. Keep the complete career catalog out of client imports. Experience/Education render this model on the server; the redesign belongs to #21.
+
+The Experience timeline displays every employment entry in the stored reverse chronological order. Education follows, with the current program first. Dates retain month/year or year-only precision, current employment uses “Present”, and in-progress education labels its end date “(expected)”. The timelines display every verified associated skill in stored order. Verified-empty and pending entries have no public skill list; description technologies are never substituted for associations. All employment entries remain expanded in #20; any earlier-history disclosure belongs to #21.
 
 The selected scope is headline, summary, jobs, education, skills and professional links. Certifications, languages, posts, recommendations, private account information and recruiter-only settings are outside this update. PDF resumes and data exports are not required. Preserve the existing portrait and illustration.
 

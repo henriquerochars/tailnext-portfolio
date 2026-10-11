@@ -1,10 +1,11 @@
 import Image from "next/image"
-import { featuredSkillIds, profileIntroduction, skills } from "@/data/profile"
+import { featuredSkillIds, profileIntroduction } from "@/data/profile"
+import SkillsList from "./SkillsList"
 
 const AboutSection = () => {
   return (
     <section id="about" aria-labelledby="about-heading">
-      <div className="my-12 pb-12 md:pt-16 md:pb-48">
+      <div className="my-12 pb-12 md:pt-16 md:pb-16">
         <h2 id="about-heading" className="text-center font-bold text-4xl">
           About Me
         </h2>
@@ -21,13 +22,7 @@ const AboutSection = () => {
           </div>
           <div className="min-w-0 text-center md:w-1/2 md:text-left">
             <h3 id="skills-heading" className="text-2xl font-bold mb-6">My Skills</h3>
-            <ul aria-labelledby="skills-heading" className="flex flex-wrap justify-center gap-2 md:justify-start">
-              {featuredSkillIds.map(id => (
-                <li key={id} className="max-w-full break-words rounded bg-gray-200 px-4 py-2 font-semibold text-stone-900 dark:bg-stone-700 dark:text-stone-100">
-                  {skills[id].label}
-                </li>
-              ))}
-            </ul>
+            <SkillsList skillIds={featuredSkillIds} label="My Skills" centeredOnMobile />
             <Image
               src="/developer-hero.png"
               alt=""

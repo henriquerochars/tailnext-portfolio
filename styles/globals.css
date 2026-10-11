@@ -1,3 +1,28 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+html {
+  scroll-behavior: smooth;
+}
+
+main > section {
+  scroll-margin-top: 6rem;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--color-teal-600);
+  outline-offset: 4px;
+}
+
+.dark a:focus-visible,
+.dark button:focus-visible {
+  outline-color: var(--color-teal-400);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

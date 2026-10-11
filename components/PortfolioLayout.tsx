@@ -25,7 +25,8 @@ export default function PortfolioLayout({ profile, children }: { profile: ReactN
       })
       let current: SectionId | null = null
       for (const entry of entries) {
-        if (entry.rect.top <= offset) current = entry.id
+        // Fragment scrolling can settle on a fractional CSS pixel.
+        if (entry.rect.top <= offset + 1) current = entry.id
       }
       // Short final sections may never reach the reading line at the document's end.
       const last = entries[entries.length - 1]

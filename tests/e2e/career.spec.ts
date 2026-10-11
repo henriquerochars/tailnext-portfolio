@@ -106,10 +106,13 @@ for (const width of [360, 768, 1024, 1280, 1440]) {
           expect(box.x + box.width).toBeLessThanOrEqual(width)
         }
         const first = section.locator("ol > li").first()
-        const date = (await first.locator(":scope > p").boundingBox())!
-        const title = (await first.getByRole("heading", { level: 3 }).boundingBox())!
-        if (width < 768) expect(date.y + date.height).toBeLessThanOrEqual(title.y)
-        else expect(date.x + date.width).toBeLessThanOrEqual(title.x)
+        const positions = await first.evaluate(entry => {
+          const date = entry.querySelector(":scope > p")!.getBoundingClientRect()
+          const title = entry.querySelector("h3")!.getBoundingClientRect()
+          return { dateBottom: date.bottom, dateRight: date.right, titleTop: title.top, titleLeft: title.left }
+        })
+        if (width < 768) expect(positions.dateBottom).toBeLessThanOrEqual(positions.titleTop)
+        else expect(positions.dateRight).toBeLessThanOrEqual(positions.titleLeft)
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
         await testInfo.attach(`${id}-${width}-${theme}`, { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" })
       }

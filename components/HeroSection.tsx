@@ -1,45 +1,25 @@
 import Image from "next/image"
 import { HiArrowDown } from "react-icons/hi"
-import { profileIntroduction } from "@/data/public-profile"
+import { AiOutlineGithub, AiOutlineLinkedin, AiOutlineTwitter } from "react-icons/ai"
+import { profileIntroduction, publicLinks } from "@/data/public-profile"
 
-const HeroSection = () => {
+export default function HeroSection() {
   return (
-    <section id="home">
-      <div className="flex flex-col text-center items-center justify-center my-10 py-16 sm:py-32 md:py-48 md:flex-row md:space-x-4 md:text-left">
-        <div className="md:mt-2 md:w-1/2">
-          <Image
-            src="/perfil.jpeg"
-            alt="Henrique Rocha"
-            width={325}
-            height={325}
-            className="rounded-full shadow-2xl"
-          />
-        </div>
-        <div className="md:mt-2 md:w-3/5">
-          <h1 className="text-4xl font-bold mt-6 md:mt-0 md:text-7xl">
-            {profileIntroduction.greeting}
-          </h1>
-          <p className="text-lg mt-4 mb-6 md:text-2xl">
-            I&#39;m a{" "}
-            <span className="font-semibold text-teal-600">
-              {profileIntroduction.role}
-            </span>
-            {" "}at {profileIntroduction.employer}, based in {profileIntroduction.location}.
-            {" "}{profileIntroduction.hero}
-          </p>
-        </div>
-      </div>
-      <div className="flex flex-row items-center justify-center text-center">
-        <a
-          href="#about"
-          aria-label="Scroll to About section"
-          className="cursor-pointer"
-        >
-          <HiArrowDown size={35} className="motion-safe:animate-bounce" />
-        </a>
-      </div>
-    </section>
+    <div className="profile-introduction">
+      <Image src="/perfil.jpeg" alt="Henrique Rocha" width={96} height={96} className="portrait" preload />
+      <p className="eyebrow">{profileIntroduction.greeting}</p>
+      <h1><a href="#home" aria-label={`Home — ${profileIntroduction.name}`}>{profileIntroduction.name}</a></h1>
+      <p className="professional-title">I&#39;m a {profileIntroduction.role} at {profileIntroduction.employer}</p>
+      <p className="profile-location">Based in {profileIntroduction.location}.</p>
+      <p className="positioning">{profileIntroduction.hero}</p>
+      <a className="about-shortcut" href="#about" aria-label="Scroll to About section">
+        Get to know me <HiArrowDown size={16} aria-hidden="true" />
+      </a>
+      <ul className="social-links" aria-label="Social links">
+        <li><a href={publicLinks.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub"><AiOutlineGithub size={24} aria-hidden="true" /></a></li>
+        <li><a href={publicLinks.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><AiOutlineLinkedin size={24} aria-hidden="true" /></a></li>
+        <li><a href={publicLinks.twitter} target="_blank" rel="noopener noreferrer" aria-label="Twitter"><AiOutlineTwitter size={24} aria-hidden="true" /></a></li>
+      </ul>
+    </div>
   )
 }
-
-export default HeroSection

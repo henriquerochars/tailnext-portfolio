@@ -2,27 +2,121 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-html {
-  scroll-behavior: smooth;
+@theme inline {
+  --font-sans: var(--font-manrope);
+  --font-mono: var(--font-plex-mono);
 }
 
-main > section {
-  scroll-margin-top: 6rem;
+:root {
+  color-scheme: light;
+  --page: #f7f3eb;
+  --surface: #efe7db;
+  --text: #302a27;
+  --muted: #6c5e55;
+  --accent: #9c452e;
+  --rule: #d6c9bb;
+  --anchor-offset: 88px;
 }
 
-a:focus-visible,
-button:focus-visible {
-  outline: 3px solid var(--color-teal-600);
-  outline-offset: 4px;
+.dark {
+  color-scheme: dark;
+  --page: #211b18;
+  --surface: #2c241f;
+  --text: #f5efe6;
+  --muted: #beb1a5;
+  --accent: #e5a084;
+  --rule: #51443a;
 }
 
-.dark a:focus-visible,
-.dark button:focus-visible {
-  outline-color: var(--color-teal-400);
+html { scroll-behavior: smooth; }
+body { background: var(--page); color: var(--text); font-family: var(--font-manrope), sans-serif; font-size: 17px; line-height: 1.7; }
+::selection { background: var(--accent); color: var(--page); }
+[id] { scroll-margin-top: var(--anchor-offset); }
+a, button, select, summary { -webkit-tap-highlight-color: transparent; transition: color 150ms ease, background-color 150ms ease; }
+a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible, main:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+a:hover { color: var(--accent); }
+
+.skip-link { position: fixed; top: 12px; left: 16px; z-index: 100; padding: 10px 16px; background: var(--text); color: var(--page); transform: translateY(-160%); }
+.skip-link:focus { transform: translateY(0); }
+.skip-link:hover { color: var(--page); }
+.portfolio-grid, .site-footer { width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: 24px; }
+.portfolio-grid { padding-top: 112px; }
+.profile-column, .reading-content, .profile-content { min-width: 0; }
+.profile-column { margin-bottom: 64px; }
+.portrait { width: 96px; height: 96px; border-radius: 50%; border: 3px solid var(--surface); }
+.eyebrow { margin-top: 24px; font-family: var(--font-plex-mono), monospace; font-size: 14px; color: var(--accent); }
+.profile-introduction h1 { max-width: 560px; margin-top: 12px; font-size: 40px; line-height: 1.08; font-weight: 700; letter-spacing: -.045em; overflow-wrap: break-word; }
+.professional-title { margin-top: 20px; font-size: 18px; line-height: 1.6; font-weight: 600; }
+.profile-location { margin-top: 8px; color: var(--muted); font-size: 16px; }
+.positioning { max-width: 450px; margin-top: 20px; color: var(--muted); }
+.about-shortcut, .blog-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--accent); font-size: 14px; font-weight: 600; }
+.about-shortcut { margin-top: 16px; }
+.about-shortcut:hover, .blog-link:hover { text-decoration: underline; text-underline-offset: 5px; }
+.social-links { display: flex; gap: 8px; margin-top: 12px; }
+.social-links a { display: flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; border: 1px solid var(--rule); border-radius: 4px; color: var(--muted); }
+.social-links a:hover { color: var(--accent); background: var(--surface); }
+.desktop-navigation { display: none; }
+.mobile-navigation { position: fixed; top: 0; inset-inline: 0; z-index: 50; background: var(--page); border-bottom: 1px solid var(--rule); }
+.mobile-bar { display: flex; align-items: center; gap: 8px; min-height: 64px; padding: 10px 16px; }
+.mobile-identity { flex: 1; min-width: 0; font-size: 14px; font-weight: 700; line-height: 1.4; }
+.menu-toggle { display: flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; cursor: pointer; border-radius: 4px; }
+.menu-toggle:hover { background: var(--surface); }
+.theme-control { min-height: 44px; min-width: 96px; max-width: 148px; padding: 8px; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); color: var(--text); font-family: var(--font-manrope), sans-serif; font-size: 14px; cursor: pointer; }
+.theme-control:disabled { cursor: default; }
+.mobile-menu { max-height: calc(100dvh - 64px); overflow-y: auto; padding: 12px 24px 20px; border-top: 1px solid var(--rule); }
+.mobile-menu[hidden] { display: none; }
+.section-links a { display: flex; align-items: center; gap: 12px; min-height: 44px; color: var(--muted); font-size: 14px; }
+.nav-rule { width: 24px; height: 2px; background: currentColor; }
+.nav-number { font-family: var(--font-plex-mono), monospace; font-size: 12px; }
+.section-links a[aria-current], .section-links a:hover { color: var(--accent); font-weight: 700; }
+.section-links a[aria-current] .nav-rule { width: 40px; }
+.reading-content > section { padding-bottom: 64px; margin-bottom: 64px; border-bottom: 1px solid var(--rule); }
+.reading-content > section:last-child { margin-bottom: 0; border-bottom: 0; }
+.section-heading { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; font-size: 26px; font-weight: 700; letter-spacing: -.025em; line-height: 1.3; }
+.section-heading > span { font-family: var(--font-plex-mono), monospace; color: var(--accent); font-size: 14px; font-weight: 500; letter-spacing: normal; }
+.about-heading { font-weight: 600; margin-bottom: 16px; font-size: 20px; }
+.about-copy { display: grid; gap: 20px; color: var(--muted); }
+.featured-skills { margin-top: 32px; }
+.featured-skills h3 { margin-bottom: 16px; font-size: 18px; font-weight: 600; }
+.about-illustration { display: none; width: 160px; height: 160px; margin-top: 24px; }
+.skills-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.skills-list > li { max-width: 100%; overflow-wrap: anywhere; padding: 4px 10px; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); color: var(--muted); font-size: 14px; line-height: 1.6; }
+.career-entry { min-width: 0; padding-block: 28px; border-top: 1px solid var(--rule); }
+.career-entry:first-child { padding-top: 0; border-top: 0; }
+.career-entry:last-child { padding-bottom: 0; }
+.career-period { margin-bottom: 12px; font-family: var(--font-plex-mono), monospace; font-size: 16px; line-height: 1.7; color: var(--muted); }
+.career-content { min-width: 0; overflow-wrap: break-word; }
+.career-content h3 { font-size: 20px; font-weight: 700; line-height: 1.45; letter-spacing: -.015em; }
+.career-organization { margin-top: 4px; color: var(--accent); font-weight: 600; }
+.career-description { display: grid; gap: 16px; margin-top: 16px; color: var(--muted); }
+.education-status { color: var(--accent); font-weight: 600; }
+.earlier-experience { margin-top: 32px; border-top: 1px solid var(--rule); padding-top: 16px; }
+.earlier-experience summary { min-height: 44px; padding-block: 8px; color: var(--accent); font-size: 16px; font-weight: 600; cursor: pointer; }
+.earlier-experience summary:hover { text-decoration: underline; text-underline-offset: 5px; }
+.earlier-experience > ol { margin-top: 24px; }
+.disclosure-open, .earlier-experience[open] .disclosure-closed { display: none; }
+.earlier-experience[open] .disclosure-open { display: inline; }
+.site-footer { padding-block: 24px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 13px; }
+
+@media (min-width: 768px) {
+  .portfolio-grid, .site-footer { padding-inline: 32px; }
+  .career-entry { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 24px; }
+  .career-period { margin-bottom: 0; }
+  .about-illustration { display: block; }
+}
+
+@media (min-width: 1280px) {
+  :root { --anchor-offset: 24px; }
+  .portfolio-grid { display: grid; grid-template-columns: minmax(0, .38fr) minmax(0, .62fr); gap: 64px; padding-top: 64px; }
+  .profile-column { margin-bottom: 0; }
+  .profile-content[data-sticky="true"] { position: sticky; top: 24px; }
+  .profile-introduction h1 { font-size: 56px; }
+  .mobile-navigation { display: none; }
+  .desktop-navigation { display: block; margin-top: 20px; }
+  .profile-utilities { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--rule); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+  html { scroll-behavior: auto; }
+  a, button, select, summary { transition: none; }
 }

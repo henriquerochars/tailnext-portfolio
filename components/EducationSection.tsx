@@ -5,9 +5,8 @@ import SkillsList from "./SkillsList"
 
 export default function EducationSection() {
   return (
-    <section id="education" aria-labelledby="education-heading" className="py-12 md:py-16">
-      <h2 id="education-heading" className="text-center text-4xl font-bold">Education</h2>
-      <hr className="mx-auto my-4 h-1 w-6 rounded border-0 bg-teal-500" />
+    <section id="education" aria-labelledby="education-heading">
+      <h2 id="education-heading" className="section-heading"><span aria-hidden="true">03</span>Education</h2>
       <CareerTimeline label="Academic background">
         {education.map(entry => (
           <CareerTimelineItem
@@ -18,7 +17,7 @@ export default function EducationSection() {
             period={<ProfilePeriod start={entry.start} end={entry.end} expected={entry.status === "in-progress"} />}
           >
             <p>{entry.field}</p>
-            {entry.status === "in-progress" ? <p className="font-semibold text-teal-700 dark:text-teal-400">In progress</p> : null}
+            {entry.status === "in-progress" ? <p className="education-status">In progress</p> : null}
             {entry.skillAssociations.status === "verified" ? (
               <SkillsList skillIds={entry.skillAssociations.skillIds} label={`Skills at ${entry.institution}`} />
             ) : null}

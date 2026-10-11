@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test"
+import { featuredSkillIds, skills } from "../../data/profile"
 
 test.describe("portfolio smoke coverage", () => {
   test.beforeEach(async ({ page }) => {
@@ -28,6 +29,14 @@ test.describe("portfolio smoke coverage", () => {
     await expect(page.getByAltText("Henrique Rocha")).not.toHaveJSProperty("naturalWidth", 0)
     await expect(page.getByRole("heading", { name: "About Me" })).toBeVisible()
     await expect(page.getByRole("heading", { name: "My Skills" })).toBeVisible()
+    await expect(page.locator("#home")).toContainText("Senior Software Engineer at Lena")
+    await expect(page.locator("#home")).toContainText("Rio de Janeiro, Brazil")
+    await expect(page.locator("#about")).toContainText("harness engineering and spec-driven development")
+    await expect(page.locator("#about")).toContainText("postgraduate program in Software Engineering for Applied AI at UNIPDS")
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1)
+    const skillList = page.getByRole("list", { name: "My Skills" })
+    await expect(skillList.getByRole("listitem")).toHaveText(featuredSkillIds.map(id => skills[id].label))
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /Senior Software Engineer at Lena/)
 
     expect(consoleErrors).toEqual([])
   })
@@ -107,6 +116,38 @@ test.describe("portfolio smoke coverage", () => {
     await page.keyboard.press("Space")
     await expect(theme).not.toHaveAttribute("aria-label", previous!)
   })
+
+  for (const width of [360, 1440]) {
+    for (const theme of ["light", "dark"]) {
+      test(`reviews professional content at ${width}px in ${theme} theme`, async ({ page }, testInfo) => {
+        await page.setViewportSize({width, height: 900})
+        await page.addInitScript(value => localStorage.setItem("theme", value), theme)
+        const linkedinRequests: string[] = []
+        page.on("request", request => {
+          if (new URL(request.url()).hostname.endsWith("linkedin.com")) linkedinRequests.push(request.url())
+        })
+        await page.goto("/")
+        await expect(page.locator("html")).toHaveClass(theme === "dark" ? /dark/ : /light/)
+        await expect(page.getByAltText("Henrique Rocha")).not.toHaveJSProperty("naturalWidth", 0)
+        const skillList = page.getByRole("list", {name: "My Skills"})
+        await skillList.scrollIntoViewIfNeeded()
+        await expect(skillList.getByRole("listitem")).toHaveCount(featuredSkillIds.length)
+        for (const item of await skillList.getByRole("listitem").all()) {
+          const box = await item.boundingBox()
+          expect(box).not.toBeNull()
+          expect(box!.x).toBeGreaterThanOrEqual(0)
+          expect(box!.x + box!.width).toBeLessThanOrEqual(width)
+        }
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+        await expect(page.locator('a[href^="mailto:"], a[href^="tel:"]')).toHaveCount(0)
+        expect(linkedinRequests).toEqual([])
+        await page.evaluate(() => document.fonts.ready)
+        await testInfo.attach(`profile-${width}-${theme}`, {
+          body: await page.screenshot({fullPage: true, animations: "disabled"}), contentType: "image/png",
+        })
+      })
+    }
+  }
 })
 
 const runtimeErrors = new WeakMap<object, string[]>()

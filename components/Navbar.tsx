@@ -4,6 +4,7 @@ import { useState, useSyncExternalStore } from "react"
 import { useTheme } from "next-themes"
 import { RiMoonFill, RiSunLine } from "react-icons/ri"
 import { IoMdMenu, IoMdClose } from "react-icons/io"
+import { publicLinks } from "@/data/public-profile"
 
 interface NavItem {
   label: string
@@ -22,7 +23,7 @@ const NAV_ITEMS: Array<NavItem> = [
   },
   {
     label: "Blog pt-br",
-    page: "https://henriquerochadevblog.vercel.app",
+    page: publicLinks.blog,
     external: true,
   },
 ]

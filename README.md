@@ -69,3 +69,7 @@ The Node.js runtime is declared in `package.json` through `engines.node`.
 ## Engineering harness
 
 Read the [engineering index](docs/engineering/index.md) and [reviewed setup](docs/engineering/bootstrap.md). Native macOS and Linux verification use Node 24.21.0 / Yarn 1.22.22; Vercel uses Node 24.x.
+
+## Professional content
+
+Follow the [LinkedIn content-update procedure and source review](docs/profile-content.md) when refreshing professional content. Updates happen on request through the browser, then become reviewed repository data. The site renders that versioned content.

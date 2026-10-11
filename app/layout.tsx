@@ -4,11 +4,12 @@ import Footer from "@/components/Footer"
 import Navbar from "@/components/Navbar"
 import Providers from "./providers"
 import "../styles/globals.css"
+import { profileIntroduction, publicLinks } from "@/data/public-profile"
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://henriquerochadev.vercel.app"),
+  metadataBase: new URL(publicLinks.portfolio),
   title: "Henrique Rocha Dev",
-  description: "Personal portfolio of Henrique Rocha Serrano, Software Engineer.",
+  description: profileIntroduction.metadataDescription,
   icons: {
     icon: "/favicon.ico",
   },

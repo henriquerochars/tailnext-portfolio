@@ -182,6 +182,13 @@
       "scope": "Portfolio engineering",
       "status": "Frozen evidence",
       "source": "Issue #17 implementation; original source anchors retained in provenance decision."
+    },
+    {
+      "path": "docs/profile-content.md",
+      "owner": "issue-19",
+      "scope": "Professional profile content and on-request updates",
+      "status": "Live",
+      "source": "Owner-selected LinkedIn browser-reading workflow; profile inspection on 2026-10-11."
     }
   ],
   "instructions": [

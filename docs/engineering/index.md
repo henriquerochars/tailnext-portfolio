@@ -8,6 +8,7 @@ Source: Adapted from manager-for-brokers df614a00fbc2377f1ce7250d993a4ce0d63230f
 
 | Task | Read |
 | --- | --- |
+| Professional content refresh | [LinkedIn content procedure and review](../profile-content.md) |
 | Start/setup | [Repository map](repo-map.md), [bootstrap](bootstrap.md), [development](local-development.md) |
 | Change/verify | [Verification](verification.md), [CI](ci.md), [acceptance](acceptance.md) |
 | Review/deliver | [Review](pr-review.md), [delivery](pr-delivery.md), [handoff](task-handoff.md) |

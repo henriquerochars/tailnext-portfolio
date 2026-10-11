@@ -1,10 +1,13 @@
 import type { Metadata } from "next"
+import { IBM_Plex_Mono, Manrope } from "next/font/google"
 
 import Footer from "@/components/Footer"
-import Navbar from "@/components/Navbar"
 import Providers from "./providers"
 import "../styles/globals.css"
 import { profileIntroduction, publicLinks } from "@/data/public-profile"
+
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" })
+const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-plex-mono", display: "swap" })
 
 export const metadata: Metadata = {
   metadataBase: new URL(publicLinks.portfolio),
@@ -22,9 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="dark:bg-stone-900">
+      <body className={`${manrope.variable} ${plexMono.variable}`}>
         <Providers>
-          <Navbar />
+          <a className="skip-link" href="#main-content">Skip to content</a>
           {children}
           <Footer />
         </Providers>

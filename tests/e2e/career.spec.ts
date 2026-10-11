@@ -89,7 +89,7 @@ for (const width of [360, 768, 1024, 1280, 1440]) {
         await navigateTo(page, label)
         if (width < 1280) await expect(menu).toHaveAttribute("aria-expanded", "false")
         await expect(page).toHaveURL(new RegExp(`#${label.toLowerCase()}$`))
-        await expect(navigation(page).getByRole("link", { name: label, exact: true, hidden: true })).toHaveAttribute("aria-current", "location")
+        await expect(navigation(page).locator(`a[href="#${label.toLowerCase()}"]`)).toHaveAttribute("aria-current", "location")
       }
       await page.getByRole("link", { name: "Home — Henrique Rocha Serrano", exact: true }).click()
       await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThanOrEqual(1)

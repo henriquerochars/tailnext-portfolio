@@ -2,6 +2,7 @@ import { test, expect } from "./fixtures"
 import { getMessages } from "../../i18n/messages"
 import { locales, localePaths } from "../../i18n/locales"
 import { employment, education } from "../../data/profile"
+import { formatDuration, monthsInclusive } from "../../lib/profile-duration"
 
 for (const locale of locales) {
   const messages = getMessages(locale)
@@ -21,6 +22,7 @@ for (const locale of locales) {
       for (const paragraph of entry.description) await expect(item).toContainText(paragraph)
       await expect(item).toContainText(employment[index].employer)
       await expect(item.locator("time").first()).toHaveAttribute("datetime", `${entry.start.year}-${String(entry.start.month).padStart(2, "0")}`)
+      await expect(item).toContainText(`${messages.ui.duration}: ${formatDuration(monthsInclusive(entry.start, entry.end, new Date()), messages.ui)}`)
       if (locale !== "en") expect(entry.description).not.toEqual(employment[index].description)
     }
     for (const [index, entry] of messages.education.entries()) {

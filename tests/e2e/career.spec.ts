@@ -1,6 +1,8 @@
 import type { Page } from "@playwright/test"
 import { expect, test } from "./fixtures"
 import { education, employment, skills } from "../../data/profile"
+import { englishUI } from "../../i18n/ui"
+import { formatDuration, isoDuration, monthsInclusive } from "../../lib/profile-duration"
 
 test.beforeEach(async ({ page }) => {
   const errors: string[] = []
@@ -31,6 +33,11 @@ test("renders the complete career and verified skills without inferring associat
     await expect(item).toContainText(organization)
     await expect(item).toBeVisible()
     if (job) for (const paragraph of entry.description) await expect(item).toContainText(paragraph)
+    if (job) {
+      const months = monthsInclusive(entry.start, entry.end, new Date())
+      await expect(item).toContainText(`Duration: ${formatDuration(months, englishUI)}`)
+      await expect(item.locator('time[datetime^="P"]')).toHaveAttribute("datetime", isoDuration(months))
+    }
     if (entry.skillAssociations.status === "verified") {
       const list = item.getByRole("list", { name: `Skills at ${organization}`, exact: true })
       await expect(list.getByRole("listitem")).toHaveText(entry.skillAssociations.skillIds.map(id => skills[id].label))
@@ -38,7 +45,7 @@ test("renders the complete career and verified skills without inferring associat
       await expect(item.getByRole("list")).toHaveCount(0)
     }
   }
-  await expect(jobs.first().locator("time")).toHaveAttribute("datetime", "2025-02")
+  await expect(jobs.first().locator("time").first()).toHaveAttribute("datetime", "2025-02")
   await expect(jobs.first()).toContainText("February 2025 — Present")
   await expect(jobs.last()).toContainText("Technical Support")
   await expect(jobs.last()).toContainText("SQL, PowerShell and Python")

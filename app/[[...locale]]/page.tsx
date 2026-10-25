@@ -7,6 +7,9 @@ import BlogSection from "@/components/BlogSection"
 import { getMessages } from "@/i18n/messages"
 import { routeLocale } from "@/i18n/locales"
 
+// The current role's duration grows every month, so regenerate the static pages daily.
+export const revalidate = 86400
+
 export function generateStaticParams() {
   return [{ locale: [] }, { locale: ["pt-br"] }, { locale: ["es"] }, { locale: ["en"] }]
 }

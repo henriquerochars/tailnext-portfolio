@@ -76,7 +76,7 @@ Follow the [LinkedIn content-update procedure and source review](docs/profile-co
 
 ## Latest blog posts
 
-The homepage loads up to five recent published posts through `/api/blog-posts`. The server reads the blog's public `search.json` index, excludes drafts and invalid entries, sorts by publication date, and deduplicates post URLs. Titles and summaries remain in Portuguese, and dates use UTC to avoid shifting the publication day across time zones.
+The homepage loads up to five recent published posts through `/api/blog-posts?locale=<locale>`. The server reads the corresponding public `search.<locale>.json` index, excludes drafts and invalid entries, sorts by publication date, and deduplicates post URLs. Titles and summaries use their translated copy when available. Untranslated entries, or an unavailable locale index, retain the original Portuguese text with an explicit source-language notice and language annotation. Dates follow the selected site language and use UTC to avoid shifting the publication day across time zones.
 
 Successful responses refresh hourly; the homepage offers a retry and a link to the blog if the index is unavailable. No provider credentials or copied MDX are required. Runtime egress must allow HTTPS to `henriquerochadevblog.vercel.app`. Browser tests mock the same-origin endpoint; data and response tests cover selection, URL validation, caching and upstream failures without contacting the live blog.
 

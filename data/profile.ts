@@ -13,7 +13,7 @@ export const profileSource: ContentSource = {
 }
 
 // All 59 LinkedIn source labels are retained. AWS/Amazon Web Services share one identity.
-// Godot and GDScript are owner-added skills: they are not on LinkedIn, so they carry no source labels.
+// Godot, GDScript and the AI tools are owner-added skills: they are not on LinkedIn, so they carry no source labels.
 export const skills = {
   "harness-engineering": { label: "Harness Engineering", sourceLabels: ["Harness Engineering"] },
   "spec-driven-development": { label: "Spec-Driven Software Development", sourceLabels: ["Spec-Driven Software Development"] },
@@ -75,19 +75,27 @@ export const skills = {
   redis: { label: "Redis", sourceLabels: ["Redis"] },
   godot: { label: "Godot", sourceLabels: [] },
   gdscript: { label: "GDScript", sourceLabels: [] },
+  claude: { label: "Claude", sourceLabels: [] },
+  "openai-codex": { label: "OpenAI Codex", sourceLabels: [] },
+  gemini: { label: "Gemini", sourceLabels: [] },
+  grok: { label: "Grok", sourceLabels: [] },
+  "t3-code": { label: "T3 Code", sourceLabels: [] },
+  orca: { label: "Orca", sourceLabels: [] },
 } as const
 
 export type SkillId = keyof typeof skills
 
 // Skills added by the owner outside LinkedIn. A LinkedIn refresh must keep them.
-export const ownerAddedSkillIds: readonly SkillId[] = ["godot", "gdscript"]
+export const ownerAddedSkillIds: readonly SkillId[] = [
+  "godot", "gdscript", "claude", "openai-codex", "gemini", "grok", "t3-code", "orca",
+]
 
 export const topSkillIds: readonly SkillId[] = ["javascript", "react", "typescript", "react-native", "node"]
 
 export const featuredSkillIds: readonly SkillId[] = [
   "typescript", "javascript", "react", "next", "react-native", "node", "nest",
   "python", "aws", "ai", "harness-engineering", "spec-driven-development",
-  "godot", "gdscript",
+  "godot", "gdscript", "claude", "openai-codex", "gemini", "grok", "t3-code", "orca",
 ]
 
 // A missing list is not proof that an entry has no associated skills.

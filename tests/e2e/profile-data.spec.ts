@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test"
 import {
-  education, employment, featuredSkillIds, globalSkillsSource, profileSource,
+  education, employment, featuredSkillIds, globalSkillsSource, ownerAddedSkillIds, profileSource,
   skills, topSkillIds, type ProfileDate,
 } from "../../data/profile"
 
@@ -75,14 +75,23 @@ test("retains source labels and verifies every skill relationship without infere
   expect(employment[2].descriptionTechnologies).not.toContain("GraphQL")
 })
 
-test("curates at most twelve verified skills while preserving the full catalog and top skills", () => {
+test("curates twelve verified skills plus owner-added skills while preserving the full catalog and top skills", () => {
   expect(featuredSkillIds.length).toBeGreaterThan(0)
-  expect(featuredSkillIds.length).toBeLessThanOrEqual(12)
+  expect(featuredSkillIds.length).toBeLessThanOrEqual(12 + ownerAddedSkillIds.length)
   expect(new Set(featuredSkillIds).size).toBe(featuredSkillIds.length)
+  const ownerAdded = new Set(ownerAddedSkillIds)
+  expect([...ownerAdded]).toEqual(["godot", "gdscript"])
+  expect(featuredSkillIds.filter(id => !ownerAdded.has(id)).length).toBeLessThanOrEqual(12)
   const associated = new Set([...employment, ...education].flatMap(entry => [...entry.skillAssociations.skillIds]))
   for (const id of [...featuredSkillIds, ...topSkillIds]) {
     expect(skills[id]).toBeDefined()
-    expect(associated.has(id)).toBe(true)
+    // LinkedIn-derived skills must be verified by an entry association; owner-added ones are not.
+    if (!ownerAdded.has(id)) expect(associated.has(id)).toBe(true)
+  }
+  for (const id of ownerAdded) {
+    expect(featuredSkillIds).toContain(id)
+    expect(skills[id].sourceLabels).toHaveLength(0)
+    expect(associated.has(id)).toBe(false)
   }
   expect(Object.keys(skills).length).toBeGreaterThan(featuredSkillIds.length)
   expect(topSkillIds).toEqual(["javascript", "react", "typescript", "react-native", "node"])

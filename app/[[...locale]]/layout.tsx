@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     metadataBase: new URL(publicLinks.portfolio), title: "Henrique Rocha Dev", description,
     alternates: { canonical, languages: { en: `${publicLinks.portfolio}/`, "pt-BR": `${publicLinks.portfolio}/pt-br`, es: `${publicLinks.portfolio}/es`, "x-default": `${publicLinks.portfolio}/` } },
     openGraph: { title: "Henrique Rocha Dev", description, url: canonical, locale: locale === "pt-BR" ? "pt_BR" : locale === "es" ? "es_ES" : "en_US", alternateLocale: ["en_US", "pt_BR", "es_ES"].filter(value => value !== (locale === "pt-BR" ? "pt_BR" : locale === "es" ? "es_ES" : "en_US")), type: "website" },
-    icons: { icon: [{ url: "/favicon.ico?v=hr-1", type: "image/x-icon", sizes: "16x16 32x32 48x48 64x64" }, { url: "/favicon-hr.png", type: "image/png", sizes: "96x96" }], apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }] },
+    icons: { icon: [{ url: "/favicon.ico?v=h-2", type: "image/x-icon", sizes: "16x16 32x32 48x48 64x64" }, { url: "/favicon-hr.png?v=h-2", type: "image/png", sizes: "96x96" }], apple: [{ url: "/apple-touch-icon.png?v=h-2", sizes: "180x180", type: "image/png" }] },
   }
 }
 export default async function RootLayout({ children, params }: Props) {

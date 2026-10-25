@@ -12,7 +12,7 @@ for (const locale of locales) {
     await page.goto(path)
     await expect(page.locator("html")).toHaveAttribute("lang", locale)
     await expect(page).toHaveTitle(`${messages.ui.portfolio} | HenriqueRochaDev`)
-    await expect(page.locator("header a[href='#home']")).toHaveText(`HenriqueRochaDev | ${messages.ui.portfolio}`)
+    await expect(page.getByRole("banner").getByRole("link", { name: `HenriqueRochaDev | ${messages.ui.portfolio}`, exact: true })).toHaveAttribute("href", "#home")
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(messages.introduction.greeting)
     for (const paragraph of messages.introduction.about) await expect(page.locator("#about")).toContainText(paragraph)
     for (const [index, entry] of messages.employment.entries()) {

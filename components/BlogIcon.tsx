@@ -1,6 +1,6 @@
 import Image from "next/image"
 
-// Reuses the blog's data/logo.svg; adjacent text supplies the accessible name.
+// Mirrors the blog's data/logo.svg (the italic "H" mark); adjacent text supplies the accessible name.
 export default function BlogIcon({ className }: { className: string }) {
-  return <Image src="/blog-logo.svg" alt="" aria-hidden="true" width={36} height={30} className={className} unoptimized />
+  return <Image src="/blog-logo.svg" alt="" aria-hidden="true" width={36} height={33} className={className} unoptimized />
 }

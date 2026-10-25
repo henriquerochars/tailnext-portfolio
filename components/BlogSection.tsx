@@ -35,7 +35,7 @@ export default function BlogSection({ locale, ui }: { locale: SiteLocale; ui: UI
   return (
     <section id="blog" aria-labelledby="blog-heading" className="py-12 md:py-16">
       <h2 id="blog-heading" className="flex items-center justify-center gap-2 text-center text-3xl font-bold sm:gap-3 sm:text-4xl">
-        <BlogIcon className="h-6 w-8 shrink-0 sm:h-8 sm:w-10" />
+        <BlogIcon className="h-6 w-6 shrink-0 sm:h-8 sm:w-8" />
         <span>{ui.latest}</span>
       </h2>
       <hr className="mx-auto my-4 h-1 w-6 rounded border-0 bg-teal-500" />

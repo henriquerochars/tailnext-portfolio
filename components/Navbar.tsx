@@ -79,7 +79,7 @@ export default function Navbar({ locale, ui }: { locale: SiteLocale; ui: UIStrin
                   onClick={() => setNavbar(false)}
                   className="flex min-h-11 items-center gap-2 whitespace-nowrap text-neutral-900 hover:text-neutral-500 dark:text-neutral-100"
                 >
-                  {item.external && <BlogIcon className="h-5 w-6 shrink-0" />}
+                  {item.external && <BlogIcon className="h-5 w-5 shrink-0" />}
                   {item.label}
                 </a>
               </li>

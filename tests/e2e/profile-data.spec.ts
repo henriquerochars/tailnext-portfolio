@@ -80,7 +80,7 @@ test("curates twelve verified skills plus owner-added skills while preserving th
   expect(featuredSkillIds.length).toBeLessThanOrEqual(12 + ownerAddedSkillIds.length)
   expect(new Set(featuredSkillIds).size).toBe(featuredSkillIds.length)
   const ownerAdded = new Set(ownerAddedSkillIds)
-  expect([...ownerAdded]).toEqual(["godot", "gdscript"])
+  expect([...ownerAdded]).toEqual(["godot", "gdscript", "claude", "openai-codex", "gemini", "grok", "t3-code", "orca"])
   expect(featuredSkillIds.filter(id => !ownerAdded.has(id)).length).toBeLessThanOrEqual(12)
   const associated = new Set([...employment, ...education].flatMap(entry => [...entry.skillAssociations.skillIds]))
   for (const id of [...featuredSkillIds, ...topSkillIds]) {

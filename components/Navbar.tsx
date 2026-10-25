@@ -46,7 +46,7 @@ export default function Navbar({ locale, ui }: { locale: SiteLocale; ui: UIStrin
   }, [navbar])
 
   return (
-    <header className="fixed top-0 z-50 w-full bg-white px-4 shadow sm:px-6 xl:px-8 dark:border-b dark:border-stone-600 dark:bg-stone-900">
+    <header className="font-header fixed top-0 z-50 w-full bg-white px-4 shadow sm:px-6 xl:px-8 dark:border-b dark:border-stone-600 dark:bg-stone-900">
       <div className="xl:flex xl:items-center xl:justify-between xl:gap-4 2xl:gap-6">
         <div className="flex items-center justify-between gap-3 py-3 xl:py-5">
           <a href="#home" onClick={() => setNavbar(false)} className="whitespace-nowrap text-[clamp(0.875rem,4.5vw,1.5rem)] leading-8 font-bold">

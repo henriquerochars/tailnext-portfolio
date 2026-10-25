@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { publicLinks } from "@/data/public-profile"
 import type { BlogPost } from "@/lib/blog-posts"
+import BlogIcon from "./BlogIcon"
 
 type FeedState = { status: "loading" | "error" } | { status: "ready"; posts: BlogPost[] }
 const dateFormat = new Intl.DateTimeFormat("pt-BR", {
@@ -32,7 +33,10 @@ export default function BlogSection() {
 
   return (
     <section id="blog" aria-labelledby="blog-heading" className="py-12 md:py-16">
-      <h2 id="blog-heading" className="text-center text-4xl font-bold">Latest blog posts</h2>
+      <h2 id="blog-heading" className="flex items-center justify-center gap-2 text-center text-3xl font-bold sm:gap-3 sm:text-4xl">
+        <BlogIcon className="h-6 w-8 shrink-0 sm:h-8 sm:w-10" />
+        <span>Latest blog posts</span>
+      </h2>
       <hr className="mx-auto my-4 h-1 w-6 rounded border-0 bg-teal-500" />
       <p className="mb-8 text-center text-neutral-600 dark:text-neutral-300">
         Notes on software development and what I learn along the way. Written in Portuguese.

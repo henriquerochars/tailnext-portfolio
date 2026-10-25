@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import localFont from "next/font/local"
 import Footer from "@/components/Footer"
 import Navbar from "@/components/Navbar"
 import Providers from "../providers"
@@ -6,6 +7,12 @@ import "../../styles/globals.css"
 import { publicLinks } from "@/data/public-profile"
 import { getMessages } from "@/i18n/messages"
 import { localePaths, routeLocale } from "@/i18n/locales"
+
+const spaceGrotesk = localFont({
+  src: "../fonts/SpaceGrotesk.ttf",
+  display: "swap",
+  variable: "--font-space-grotesk",
+})
 
 type Props = { children: React.ReactNode; params: Promise<{ locale?: string[] }> }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -21,5 +28,5 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 export default async function RootLayout({ children, params }: Props) {
   const locale = routeLocale((await params).locale) ?? "en"
-  return <html lang={locale} suppressHydrationWarning><body className="dark:bg-stone-900"><Providers><Navbar locale={locale} ui={getMessages(locale).ui} />{children}<Footer /></Providers></body></html>
+  return <html lang={locale} className={spaceGrotesk.variable} suppressHydrationWarning><body className="dark:bg-stone-900"><Providers><Navbar locale={locale} ui={getMessages(locale).ui} />{children}<Footer /></Providers></body></html>
 }

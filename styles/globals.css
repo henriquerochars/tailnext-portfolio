@@ -2,6 +2,13 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Header font shared with the blog header (Space Grotesk). */
+@theme {
+  --font-header:
+    var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
 html {
   scroll-behavior: smooth;
 }

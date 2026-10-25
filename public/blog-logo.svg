@@ -1,9 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 92" width="53.87" height="49.56" role="img" aria-label="H">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="32" height="32" role="img" aria-label="H">
   <defs>
-    <linearGradient id="hr-logo-gradient" gradientUnits="userSpaceOnUse" x1="50" y1="0" x2="50" y2="92">
+    <linearGradient id="h-mark-black" gradientUnits="userSpaceOnUse" x1="50" y1="0" x2="50" y2="92">
       <stop offset="0%" stop-color="#06b6d4"/>
       <stop offset="100%" stop-color="#67e8f9"/>
     </linearGradient>
   </defs>
-  <path fill="url(#hr-logo-gradient)" d="M20.0 0 L42.0 0 L22.0 92.0 L0 92.0 Z M76.0 0 L98.0 0 L78.0 92.0 L56.0 92.0 Z M32.67 36.0 L69.67 36.0 L65.33 56.0 L28.33 56.0 Z"/>
+  <rect width="128" height="128" rx="28" fill="#000000"/>
+  
+  <g transform="translate(29.00 31.80) scale(0.7)">
+    <path fill="url(#h-mark-black)" d="M20.0 0 L42.0 0 L22.0 92.0 L0 92.0 Z M76.0 0 L98.0 0 L78.0 92.0 L56.0 92.0 Z M32.67 36.0 L69.67 36.0 L65.33 56.0 L28.33 56.0 Z"/>
+  </g>
 </svg>

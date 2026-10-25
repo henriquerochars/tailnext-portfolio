@@ -5,12 +5,14 @@ import { useTheme } from "next-themes"
 import { RiMoonFill, RiSunLine } from "react-icons/ri"
 import { IoMdMenu, IoMdClose } from "react-icons/io"
 import { publicLinks } from "@/data/public-profile"
+import BlogIcon from "./BlogIcon"
 
 const NAV_ITEMS = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
   { label: "Experience", href: "#experience" },
   { label: "Education", href: "#education" },
+  { label: "Last 5 posts", href: "#blog" },
   { label: "Blog pt-br", href: publicLinks.blog, external: true },
 ]
 
@@ -38,7 +40,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 z-50 w-full bg-white px-4 shadow sm:px-6 lg:px-8 dark:border-b dark:border-stone-600 dark:bg-stone-900">
-      <div className="lg:flex lg:items-center lg:justify-between lg:gap-6">
+      <div className="lg:flex lg:items-center lg:justify-between lg:gap-4 xl:gap-6">
         <div className="flex items-center justify-between gap-3 py-3 lg:py-5">
           <a href="#home" onClick={() => setNavbar(false)} className="text-2xl font-bold">
             Henrique Rocha Dev
@@ -60,7 +62,7 @@ export default function Navbar() {
           aria-label="Main navigation"
           className={`max-h-[calc(100dvh-5rem)] overflow-y-auto pb-3 lg:block lg:overflow-visible lg:pb-0 ${navbar ? "block" : "hidden"}`}
         >
-          <ul className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
+          <ul className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-3 xl:gap-4">
             {NAV_ITEMS.map(item => (
               <li key={item.href}>
                 <a
@@ -68,8 +70,9 @@ export default function Navbar() {
                   target={item.external ? "_blank" : undefined}
                   rel={item.external ? "noopener noreferrer" : undefined}
                   onClick={() => setNavbar(false)}
-                  className="flex min-h-11 items-center text-neutral-900 hover:text-neutral-500 dark:text-neutral-100"
+                  className="flex min-h-11 items-center gap-2 whitespace-nowrap text-neutral-900 hover:text-neutral-500 dark:text-neutral-100"
                 >
+                  {item.external && <BlogIcon className="h-5 w-6 shrink-0" />}
                   {item.label}
                 </a>
               </li>

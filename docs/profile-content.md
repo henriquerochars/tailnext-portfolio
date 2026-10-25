@@ -12,6 +12,8 @@ The [LinkedIn profile](https://www.linkedin.com/in/henriquerochaserrano/) is the
 
 The Experience timeline displays every employment entry in the stored reverse chronological order. Education follows, with the current program first. Dates retain month/year or year-only precision, current employment uses “Present”, and in-progress education labels its end date “(expected)”. The timelines display every verified associated skill in stored order. Verified-empty and pending entries have no public skill list; description technologies are never substituted for associations. All employment entries remain expanded in #20; any earlier-history disclosure belongs to #21.
 
+Each employment entry also states its total time explicitly (for example “Duration: 1 year and 7 months”), in English, Portuguese and Spanish. The duration is calculated by `lib/profile-duration.ts` from the stored month/year dates and counts both the start month and the end month, the LinkedIn convention (August 2023 to February 2025 is 19 months). A role with `end: null` counts through the current month, so the home page is regenerated daily. Changing the start or end of an entry changes its duration; do not store duration strings.
+
 The selected scope is headline, summary, jobs, education, skills and professional links. Certifications, languages, posts, recommendations, private account information and recruiter-only settings are outside this update. PDF resumes and data exports are not required. Preserve the existing portrait and illustration.
 
 ## Repeatable update procedure
@@ -47,7 +49,7 @@ The source contains 59 global skill labels, normalized to 58 catalog identities.
 
 Banestes and Estácio display no association list in their complete entries and are absent from the fully loaded global associations. This is recorded as verified empty, not as a claim that the owner lacks those skills. Banestes's SQL, PowerShell and Python remain description-derived technologies. Conversely, LendingClub's GraphQL association is retained even though GraphQL is absent from its role description.
 
-UNIPDS is in progress: September 2026 to an expected September 2027. Estácio is completed, 2018–2022; no months are invented. Employment dates use month/year and Lena remains open-ended. Source duration strings are excluded.
+UNIPDS is in progress: September 2026 to an expected September 2027. Estácio is completed, 2018–2022; no months are invented. Employment dates use month/year and Lena remains open-ended. Source duration strings are not copied; durations are calculated from the stored dates (see below).
 
 ## Skill-association review matrix
 

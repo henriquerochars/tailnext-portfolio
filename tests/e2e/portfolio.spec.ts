@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test"
+import { expect, test } from "./fixtures"
 import { featuredSkillIds, skills } from "../../data/profile"
 
 test.describe("portfolio smoke coverage", () => {

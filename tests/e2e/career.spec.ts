@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test"
+import type { Page } from "@playwright/test"
+import { expect, test } from "./fixtures"
 import { education, employment, skills } from "../../data/profile"
 
 test.beforeEach(async ({ page }) => {
@@ -16,7 +17,7 @@ test.afterEach(async ({ page }) => {
 test("renders the complete career and verified skills without inferring associations", async ({ page }) => {
   await page.goto("/")
   expect(await page.locator("main > section").evaluateAll(sections => sections.map(section => section.id))).toEqual([
-    "home", "about", "experience", "education",
+    "home", "about", "experience", "education", "blog",
   ])
   const jobs = page.getByRole("list", { name: "Professional experience", exact: true }).locator(":scope > li")
   const studies = page.getByRole("list", { name: "Academic background", exact: true }).locator(":scope > li")
@@ -51,7 +52,7 @@ test("renders the complete career and verified skills without inferring associat
   await expect(studies.last()).not.toContainText("expected")
   await expect(studies.last()).not.toContainText("In progress")
   await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1)
-  await expect(page.getByRole("heading", { level: 2 })).toHaveText(["About Me", "Experience", "Education"])
+  await expect(page.getByRole("heading", { level: 2 })).toHaveText(["About Me", "Experience", "Education", "Latest blog posts"])
 })
 
 for (const width of [360, 768, 1024, 1440]) {

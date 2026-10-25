@@ -63,7 +63,7 @@ for (const width of [360, 768, 1024, 1440]) {
       await page.goto("/")
       await expect(page.locator("html")).toHaveClass(theme === "dark" ? /dark/ : /light/)
       const menu = page.getByRole("button", { name: "Open navigation menu" })
-      if (width < 1024) {
+      if (width < 1280) {
         await expect(menu).toBeVisible()
         await menu.click()
         await expect(page.getByRole("button", { name: "Close navigation menu" })).toHaveAttribute("aria-expanded", "true")
@@ -82,11 +82,11 @@ for (const width of [360, 768, 1024, 1440]) {
         })
       }
       for (const label of ["Experience", "Education", "About", "Home"]) {
-        if (width < 1024) await menu.click()
+        if (width < 1280) await menu.click()
         const link = page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: label, exact: true })
         await expect(link).toHaveAttribute("href", `#${label.toLowerCase()}`)
         await link.click()
-        if (width < 1024) await expect(menu).toHaveAttribute("aria-expanded", "false")
+        if (width < 1280) await expect(menu).toHaveAttribute("aria-expanded", "false")
         await expect(page).toHaveURL(new RegExp(`#${label.toLowerCase()}$`))
         await expectHeadingBelowHeader(page, label === "Home" ? "Hi, I'm Henrique!" : label === "About" ? "About Me" : label)
       }

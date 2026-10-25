@@ -10,10 +10,10 @@ for (const width of [320, 360, 1024, 1440]) {
       await page.addInitScript(value => localStorage.setItem("theme", value), theme)
       await page.goto("/")
       const menu = page.getByRole("button", { name: "Open navigation menu" })
-      if (width < 1024) await menu.click()
+      if (width < 1280) await menu.click()
       const nav = page.getByRole("navigation", { name: "Main navigation" })
-      const external = nav.getByRole("link", { name: "Blog pt-br", exact: true })
-      await expect(external).toHaveAttribute("href", "https://henriquerochadevblog.vercel.app")
+      const external = nav.getByRole("link", { name: "Blog", exact: true })
+      await expect(external).toHaveAttribute("href", "https://henriquerochadevblog.vercel.app/en")
       await expect(external).toHaveAttribute("target", "_blank")
       await expect(external.locator("img")).toBeVisible()
       await expect(external.locator("img")).toHaveJSProperty("naturalWidth", 54)
@@ -26,7 +26,7 @@ for (const width of [320, 360, 1024, 1440]) {
       await sectionLink.focus()
       await page.keyboard.press("Enter")
       await expect(page).toHaveURL(/#blog$/)
-      if (width < 1024) await expect(menu).toHaveAttribute("aria-expanded", "false")
+      if (width < 1280) await expect(menu).toHaveAttribute("aria-expanded", "false")
       const heading = page.getByRole("heading", { name: "Latest blog posts", exact: true })
       await expect(heading).toBeInViewport()
       await expect(heading.locator("img")).toBeVisible()
@@ -58,8 +58,8 @@ for (const width of [360, 1440]) {
       const section = page.getByRole("region", { name: "Latest blog posts" })
       const list = section.getByRole("list", { name: "Latest blog posts" })
       await expect(list.getByRole("listitem")).toHaveCount(5)
-      await expect(list.getByRole("heading", { level: 3 })).toHaveText(blogPosts.map(post => `${post.title} (abre em uma nova aba)`))
-      await expect(list.locator("time").first()).toHaveText("6 de outubro de 2026")
+      await expect(list.getByRole("heading", { level: 3 })).toHaveText(blogPosts.map(post => `${post.title} (opens in a new tab)`))
+      await expect(list.locator("time").first()).toHaveText("October 6, 2026")
       await expect(list.locator("time").first()).toHaveAttribute("datetime", blogPosts[0].date)
       await expect(list).toHaveAttribute("lang", "pt-BR")
       for (const [index, post] of blogPosts.entries()) {
@@ -84,7 +84,7 @@ for (const width of [360, 1440]) {
 test("shows loading while the feed is pending", async ({ page }) => {
   let release!: () => void
   const pending = new Promise<void>(resolve => { release = resolve })
-  await page.route("**/api/blog-posts", async route => {
+  await page.route("**/api/blog-posts*", async route => {
     await pending
     await route.fulfill({ json: { posts: blogPosts } })
   })
@@ -98,15 +98,15 @@ test("shows loading while the feed is pending", async ({ page }) => {
 })
 
 test("shows a useful empty state when there are no published posts", async ({ page }) => {
-  await page.route("**/api/blog-posts", route => route.fulfill({ json: { posts: [] } }))
+  await page.route("**/api/blog-posts*", route => route.fulfill({ json: { posts: [] } }))
   await page.goto("/#blog")
   await expect(page.getByText("No published posts yet. Check back soon.")).toBeVisible()
-  await expect(page.getByRole("link", { name: /Read all posts/ })).toHaveAttribute("href", "https://henriquerochadevblog.vercel.app")
+  await expect(page.getByRole("link", { name: /Read all posts/ })).toHaveAttribute("href", "https://henriquerochadevblog.vercel.app/en")
 })
 
 test("keeps the portfolio usable when the feed fails and can retry", async ({ page }) => {
   let attempts = 0
-  await page.route("**/api/blog-posts", route => {
+  await page.route("**/api/blog-posts*", route => {
     attempts += 1
     return attempts === 1
       ? route.fulfill({ status: 502, json: { error: "Unavailable" } })

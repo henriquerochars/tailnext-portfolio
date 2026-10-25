@@ -13,7 +13,7 @@ export const blogPosts = latestBlogPosts(blogIndex)
 // Browser behavior is deterministic and never contacts the live blog.
 export const test = base.extend({
   page: async ({ page }, runTest) => {
-    await page.route("**/api/blog-posts", route => route.fulfill({ json: { posts: blogPosts } }))
+    await page.route("**/api/blog-posts*", route => route.fulfill({ json: { posts: blogPosts } }))
     await runTest(page)
   },
 })

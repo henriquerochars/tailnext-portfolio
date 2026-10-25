@@ -76,6 +76,16 @@ Follow the [LinkedIn content-update procedure and source review](docs/profile-co
 
 ## Latest blog posts
 
-The homepage loads up to five recent published posts through `/api/blog-posts`. The server reads the blog's public `search.json` index, excludes drafts and invalid entries, sorts by publication date, and deduplicates post URLs. Titles and summaries remain in Portuguese, and dates use UTC to avoid shifting the publication day across time zones.
+The homepage loads up to five recent published posts through `/api/blog-posts?locale=<locale>`. The server reads the corresponding public `search.<locale>.json` index, excludes drafts and invalid entries, sorts by publication date, and deduplicates post URLs. Titles and summaries use their translated copy when available. Untranslated entries, or an unavailable locale index, retain the original Portuguese text with an explicit source-language notice and language annotation. Dates follow the selected site language and use UTC to avoid shifting the publication day across time zones.
 
 Successful responses refresh hourly; the homepage offers a retry and a link to the blog if the index is unavailable. No provider credentials or copied MDX are required. Runtime egress must allow HTTPS to `henriquerochadevblog.vercel.app`. Browser tests mock the same-origin endpoint; data and response tests cover selection, URL validation, caching and upstream failures without contacting the live blog.
+
+## Site languages
+
+English remains available at `/`; Brazilian Portuguese uses `/pt-br` and Spanish uses `/es`. `/en` redirects to the English canonical URL. Language URLs are deterministic and survive reloads; the shared header selector keeps the current query and section fragment. Locale routes statically render their HTML language, translated metadata, canonical/hreflang links and sitemap alternatives. Dates use `Intl.DateTimeFormat` with UTC.
+
+Local dictionaries in `i18n/messages.ts` contain versioned Portuguese and Spanish editorial translations prepared by Sol 6.1. The original English introduction and career catalog remain in `data/`; IDs, company names, technical product names, dates and provenance stay intact. Components receive translated presentation data on the server, and client controls receive only their required UI strings. Add or update all locales together when changing authored copy. There are no runtime LLM calls, translation widgets or API keys.
+
+This small, single-page portfolio uses native [Next.js App Router internationalization](https://nextjs.org/docs/app/guides/internationalization), typed dictionaries and `Intl`. [next-intl](https://github.com/amannn/next-intl/blob/main/LICENSE) and [next-i18next](https://github.com/i18next/next-i18next/blob/master/LICENSE) are established MIT-licensed alternatives; their message/runtime integration is unnecessary for this scope. The selector's TSX and CSS are identical to the blog's shared files, with a local router adapter.
+
+The recent-post API accepts only `pt-BR`, `en` or `es` and requests the blog's corresponding `/search.<locale>.json` index. Paths are validated against the selected language and the fixed blog origin. During independent deployments, an unavailable locale index falls back to the existing Portuguese `/search.json`; the page labels Portuguese source text explicitly and preserves its language annotation. Cross-site links open the corresponding blog locale (Portuguese root, `/en` or `/es`).

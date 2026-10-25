@@ -71,9 +71,9 @@ test.describe("portfolio smoke coverage", () => {
   test("exposes the expected external links", async ({ page }) => {
     await page.goto("/")
 
-    await expect(page.getByRole("link", { name: "Blog pt-br" })).toHaveAttribute(
+    await expect(page.getByRole("link", { name: "Blog" })).toHaveAttribute(
       "href",
-      "https://henriquerochadevblog.vercel.app"
+      "https://henriquerochadevblog.vercel.app/en"
     )
     await expect(page.getByRole("link", { name: "GitHub" })).toHaveAttribute(
       "href",
@@ -108,7 +108,7 @@ test.describe("portfolio smoke coverage", () => {
     for (let i = 0; i < 12 && !(await about.evaluate(element => element === document.activeElement)); i++) await page.keyboard.press("Tab")
     await expect(about).toBeFocused()
     // Check header order before native fragment navigation changes the tab starting point.
-    for (const name of ["Experience", "Education", "Last 5 posts", "Blog pt-br"]) {
+    for (const name of ["Experience", "Education", "Last 5 posts", "Blog"]) {
       await page.keyboard.press("Tab")
       await expect(page.getByRole("link", { name, exact: true })).toBeFocused()
     }
@@ -118,7 +118,7 @@ test.describe("portfolio smoke coverage", () => {
     await expect(theme).toBeFocused()
     await page.keyboard.press("Space")
     await expect(theme).not.toHaveAttribute("aria-label", previous!)
-    for (const name of ["Blog pt-br", "Last 5 posts", "Education", "Experience", "About"]) {
+    for (const name of ["Blog", "Last 5 posts", "Education", "Experience", "About"]) {
       await page.keyboard.press("Shift+Tab")
       await expect(page.getByRole("link", { name, exact: true })).toBeFocused()
     }

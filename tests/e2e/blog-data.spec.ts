@@ -14,6 +14,7 @@ test("selects the five newest unique published posts and excludes drafts and inv
   ])
   expect(posts.map(post => post.title)).toEqual([6, 5, 4, 3, 2].map(day => `Aprendizado ${day}`))
   expect(posts[0]).toEqual({
+    locale: "pt-BR",
     title: "Aprendizado 6",
     url: "https://henriquerochadevblog.vercel.app/blog/aprendizado-6",
     date: "2026-10-06T00:00:00.000Z",
@@ -37,7 +38,7 @@ test("rejects links outside blog post paths, redirects and traversal", () => {
 
 test("fetches only the canonical JSON index with bounded time and hourly caching", async () => {
   const fetcher: typeof fetch = async (url, options) => {
-    expect(url).toBe("https://henriquerochadevblog.vercel.app/search.json")
+    expect(url).toBe("https://henriquerochadevblog.vercel.app/search.pt-BR.json")
     expect(options).toMatchObject({ cache: "no-store", redirect: "error", headers: { Accept: "application/json" } })
     expect(options?.signal).toBeInstanceOf(AbortSignal)
     return Response.json(blogIndex)
@@ -68,10 +69,39 @@ test("can recover immediately after an invalid HTTP-200 upstream response", asyn
   const fetcher: typeof fetch = async (_url, options) => {
     expect(options?.cache).toBe("no-store")
     calls += 1
-    return calls === 1 ? new Response("temporarily invalid json") : Response.json(blogIndex)
+    return calls <= 2 ? new Response("temporarily invalid json") : Response.json(blogIndex)
   }
   expect((await blogPostsResponse(fetcher)).status).toBe(502)
   const recovered = await blogPostsResponse(fetcher)
   expect(recovered.status).toBe(200)
   expect((await recovered.json()).posts).toHaveLength(5)
+})
+
+test("uses only selected locale feed paths and labels deployment fallback as Portuguese", async () => {
+  const calls: string[] = []
+  const response = await blogPostsResponse(async url => {
+    calls.push(String(url))
+    return String(url).endsWith("search.es.json") ? new Response("Not deployed", { status: 404 }) : Response.json(blogIndex)
+  }, "es")
+  expect(calls).toEqual(["https://henriquerochadevblog.vercel.app/search.es.json", "https://henriquerochadevblog.vercel.app/search.json"])
+  expect((await response.json()).sourceLocale).toBe("pt-BR")
+  const translated = [{ ...blogIndex[0], title: "Learning", path: "en/blog/aprendizado-2", locale: "en" }]
+  const english = await blogPostsResponse(async url => {
+    expect(url).toBe("https://henriquerochadevblog.vercel.app/search.en.json")
+    return Response.json(translated)
+  }, "en")
+  expect(await english.json()).toMatchObject({ sourceLocale: "en", posts: [{ title: "Learning", url: "https://henriquerochadevblog.vercel.app/en/blog/aprendizado-2" }] })
+  expect(latestBlogPosts([...translated, { ...translated[0], path: "es/blog/post" }, { ...translated[0], path: "en/blog/../escape" }, { ...translated[0], locale: "fr" }], "en")).toHaveLength(1)
+})
+
+test("retains Portuguese fallback text on safe localized paths without admitting other languages or drafts", () => {
+  const posts = latestBlogPosts([
+    { ...blogIndex[0], path: "en/blog/translated", title: "Translated", locale: "en" },
+    { ...blogIndex[1], path: "en/blog/original", title: "Original em português", locale: "pt-BR" },
+    { ...blogIndex[2], path: "en/blog/spanish", locale: "es" },
+    { ...blogIndex[3], path: "en/blog/draft", locale: "pt-BR", draft: true },
+    { ...blogIndex[4], path: "blog/wrong-prefix", locale: "pt-BR" },
+  ], "en")
+  expect(posts.map(post => [post.title, post.locale])).toEqual([["Original em português", "pt-BR"], ["Translated", "en"]])
+  expect(posts.every(post => post.url.startsWith("https://henriquerochadevblog.vercel.app/en/blog/"))).toBe(true)
 })

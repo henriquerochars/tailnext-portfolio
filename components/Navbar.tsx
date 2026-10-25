@@ -6,21 +6,28 @@ import { RiMoonFill, RiSunLine } from "react-icons/ri"
 import { IoMdMenu, IoMdClose } from "react-icons/io"
 import { publicLinks } from "@/data/public-profile"
 import BlogIcon from "./BlogIcon"
+import LanguageSwitcher from "./LanguageSwitcher"
+import { localePaths, type SiteLocale } from "@/i18n/locales"
+import type { UIStrings } from "@/i18n/ui"
+import { useRouter } from "next/navigation"
 
-const NAV_ITEMS = [
-  { label: "Home", href: "#home" },
-  { label: "About", href: "#about" },
-  { label: "Experience", href: "#experience" },
-  { label: "Education", href: "#education" },
-  { label: "Last 5 posts", href: "#blog" },
-  { label: "Blog pt-br", href: publicLinks.blog, external: true },
-]
 
 const subscribeToMount = () => () => {}
 const clientMounted = () => true
 const serverMounted = () => false
 
-export default function Navbar() {
+export default function Navbar({ locale, ui }: { locale: SiteLocale; ui: UIStrings }) {
+  const router = useRouter()
+  const blogHref = publicLinks.blog + (locale === "pt-BR" ? "" : `/${locale}`)
+  const NAV_ITEMS = [
+    { label: ui.home, href: "#home" }, { label: ui.about, href: "#about" },
+    { label: ui.experience, href: "#experience" }, { label: ui.education, href: "#education" },
+    { label: ui.latestNav, href: "#blog" }, { label: ui.blog, href: blogHref, external: true },
+  ]
+  function changeLocale(next: SiteLocale) {
+    setNavbar(false)
+    router.push(`${localePaths[next] || "/"}${window.location.search}${window.location.hash}`)
+  }
   const { systemTheme, theme, setTheme } = useTheme()
   const mounted = useSyncExternalStore(subscribeToMount, clientMounted, serverMounted)
   const currentTheme = mounted ? (theme === "system" ? systemTheme : theme) : "light"
@@ -39,19 +46,19 @@ export default function Navbar() {
   }, [navbar])
 
   return (
-    <header className="fixed top-0 z-50 w-full bg-white px-4 shadow sm:px-6 lg:px-8 dark:border-b dark:border-stone-600 dark:bg-stone-900">
-      <div className="lg:flex lg:items-center lg:justify-between lg:gap-4 xl:gap-6">
-        <div className="flex items-center justify-between gap-3 py-3 lg:py-5">
+    <header className="fixed top-0 z-50 w-full bg-white px-4 shadow sm:px-6 xl:px-8 dark:border-b dark:border-stone-600 dark:bg-stone-900">
+      <div className="xl:flex xl:items-center xl:justify-between xl:gap-4 2xl:gap-6">
+        <div className="flex items-center justify-between gap-3 py-3 xl:py-5">
           <a href="#home" onClick={() => setNavbar(false)} className="text-2xl font-bold">
             Henrique Rocha Dev
           </a>
           <button
             ref={menuButton}
             type="button"
-            aria-label={navbar ? "Close navigation menu" : "Open navigation menu"}
+            aria-label={navbar ? ui.closeMenu : ui.openMenu}
             aria-expanded={navbar}
             aria-controls="primary-navigation"
-            className="shrink-0 rounded-md p-2 text-stone-700 lg:hidden dark:text-stone-200"
+            className="shrink-0 rounded-md p-2 text-stone-700 xl:hidden dark:text-stone-200"
             onClick={() => setNavbar(open => !open)}
           >
             {navbar ? <IoMdClose size={30} /> : <IoMdMenu size={30} />}
@@ -59,10 +66,10 @@ export default function Navbar() {
         </div>
         <nav
           id="primary-navigation"
-          aria-label="Main navigation"
-          className={`max-h-[calc(100dvh-5rem)] overflow-y-auto pb-3 lg:block lg:overflow-visible lg:pb-0 ${navbar ? "block" : "hidden"}`}
+          aria-label={ui.navigation}
+          className={`max-h-[calc(100dvh-5rem)] overflow-y-auto pb-3 xl:block xl:overflow-visible xl:pb-0 ${navbar ? "block" : "hidden"}`}
         >
-          <ul className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-3 xl:gap-4">
+          <ul className="flex flex-col gap-2 xl:flex-row xl:items-center xl:gap-3 2xl:gap-4">
             {NAV_ITEMS.map(item => (
               <li key={item.href}>
                 <a
@@ -80,7 +87,7 @@ export default function Navbar() {
             <li>
               <button
                 type="button"
-                aria-label={currentTheme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+                aria-label={currentTheme === "dark" ? ui.lightTheme : ui.darkTheme}
                 disabled={!mounted}
                 onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
                 className="flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-slate-300 p-2 text-black"
@@ -88,6 +95,7 @@ export default function Navbar() {
                 {currentTheme === "dark" ? <RiSunLine size={25} /> : <RiMoonFill size={25} />}
               </button>
             </li>
+            <li><LanguageSwitcher locale={locale} label={ui.language} onLocaleChange={changeLocale} /></li>
           </ul>
         </nav>
       </div>

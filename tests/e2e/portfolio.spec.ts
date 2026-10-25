@@ -22,7 +22,8 @@ test.describe("portfolio smoke coverage", () => {
 
     await page.goto("/")
 
-    await expect(page).toHaveTitle("Henrique Rocha Dev")
+    await expect(page).toHaveTitle("Portfolio | HenriqueRochaDev")
+    await expect(page.getByRole("link", { name: "HenriqueRochaDev | Portfolio", exact: true })).toBeVisible()
     await expect(page.getByRole("heading", { name: "Hi, I'm Henrique!" })).toBeVisible()
     await expect(page.getByAltText("Henrique Rocha")).toBeVisible()
     await expect(page.getByAltText("Henrique Rocha")).toHaveJSProperty("complete", true)

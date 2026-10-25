@@ -16,7 +16,7 @@ for (const width of [320, 360, 1024, 1440]) {
       await expect(external).toHaveAttribute("href", "https://henriquerochadevblog.vercel.app/en")
       await expect(external).toHaveAttribute("target", "_blank")
       await expect(external.locator("img")).toBeVisible()
-      await expect(external.locator("img")).toHaveJSProperty("naturalWidth", 54)
+      await expect(external.locator("img")).toHaveJSProperty("naturalWidth", 32)
       await expect(external.locator("img")).toHaveAttribute("alt", "")
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
       await testInfo.attach(`blog-header-${width}-${theme}`, { body: await page.getByRole("banner").screenshot({ animations: "disabled" }), contentType: "image/png" })
@@ -30,7 +30,7 @@ for (const width of [320, 360, 1024, 1440]) {
       const heading = page.getByRole("heading", { name: "Latest blog posts", exact: true })
       await expect(heading).toBeInViewport()
       await expect(heading.locator("img")).toBeVisible()
-      await expect(heading.locator("img")).toHaveJSProperty("naturalWidth", 54)
+      await expect(heading.locator("img")).toHaveJSProperty("naturalWidth", 32)
       await expect(heading.locator("img")).toHaveAttribute("aria-hidden", "true")
       await expect.poll(async () => {
         const title = await heading.boundingBox()

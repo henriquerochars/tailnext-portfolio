@@ -1,8 +1,9 @@
 import Image from "next/image"
 import { HiArrowDown } from "react-icons/hi"
-import { profileIntroduction } from "@/data/public-profile"
+import type { Messages } from "@/i18n/messages"
 
-const HeroSection = () => {
+const HeroSection = ({ messages }: { messages: Messages }) => {
+  const { introduction: profileIntroduction, ui } = messages
   return (
     <section id="home">
       <div className="flex flex-col text-center items-center justify-center my-10 py-16 sm:py-32 md:py-48 md:flex-row md:space-x-4 md:text-left">
@@ -20,11 +21,11 @@ const HeroSection = () => {
             {profileIntroduction.greeting}
           </h1>
           <p className="text-lg mt-4 mb-6 md:text-2xl">
-            I&#39;m a{" "}
+            {ui.rolePrefix}{" "}
             <span className="font-semibold text-teal-600">
               {profileIntroduction.role}
             </span>
-            {" "}at {profileIntroduction.employer}, based in {profileIntroduction.location}.
+            {" "}{ui.at} {profileIntroduction.employer}, {ui.based} {profileIntroduction.location}.
             {" "}{profileIntroduction.hero}
           </p>
         </div>
@@ -32,7 +33,7 @@ const HeroSection = () => {
       <div className="flex flex-row items-center justify-center text-center">
         <a
           href="#about"
-          aria-label="Scroll to About section"
+          aria-label={ui.scrollAbout}
           className="cursor-pointer"
         >
           <HiArrowDown size={35} className="motion-safe:animate-bounce" />

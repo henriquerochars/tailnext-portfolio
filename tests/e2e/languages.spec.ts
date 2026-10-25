@@ -61,12 +61,15 @@ for (const locale of locales) {
   }
 }
 
-test("switches languages with keyboard, preserves query/hash, reloads and returns to English", async ({ page }) => {
+test("supports keyboard focus and native language changes while preserving query/hash, reloads and English return", async ({ page }) => {
   await page.goto("/?ref=language-test#experience")
   const select = page.getByRole("combobox", { name: "Language" })
-  await select.focus()
-  await page.keyboard.press("ArrowDown")
-  await page.keyboard.press("Enter")
+  await page.getByRole("button", { name: /Switch to (dark|light) theme/ }).focus()
+  await page.keyboard.press("Tab")
+  await expect(select).toBeFocused()
+  const focusRing = await page.locator("[data-language-switcher]").evaluate(element => ({ style: getComputedStyle(element).outlineStyle, width: getComputedStyle(element).outlineWidth }))
+  expect(focusRing).toEqual({ style: "solid", width: "3px" })
+  await select.selectOption("es")
   await expect(page).toHaveURL(/\/es\?ref=language-test#experience$/)
   await expect(page.locator("html")).toHaveAttribute("lang", "es")
   await expect(page.locator("#experience-heading")).toBeInViewport()

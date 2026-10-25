@@ -38,7 +38,7 @@ test("rejects links outside blog post paths, redirects and traversal", () => {
 test("fetches only the canonical JSON index with bounded time and hourly caching", async () => {
   const fetcher: typeof fetch = async (url, options) => {
     expect(url).toBe("https://henriquerochadevblog.vercel.app/search.json")
-    expect(options).toMatchObject({ next: { revalidate: 3600 }, redirect: "error", headers: { Accept: "application/json" } })
+    expect(options).toMatchObject({ cache: "no-store", redirect: "error", headers: { Accept: "application/json" } })
     expect(options?.signal).toBeInstanceOf(AbortSignal)
     return Response.json(blogIndex)
   }
@@ -61,4 +61,17 @@ test("does not cache upstream failures, malformed responses or timeouts", async 
     expect(response.headers.get("cache-control")).toBe("no-store")
     expect(await response.json()).toEqual({ error: "Blog posts are temporarily unavailable." })
   }
+})
+
+test("can recover immediately after an invalid HTTP-200 upstream response", async () => {
+  let calls = 0
+  const fetcher: typeof fetch = async (_url, options) => {
+    expect(options?.cache).toBe("no-store")
+    calls += 1
+    return calls === 1 ? new Response("temporarily invalid json") : Response.json(blogIndex)
+  }
+  expect((await blogPostsResponse(fetcher)).status).toBe(502)
+  const recovered = await blogPostsResponse(fetcher)
+  expect(recovered.status).toBe(200)
+  expect((await recovered.json()).posts).toHaveLength(5)
 })

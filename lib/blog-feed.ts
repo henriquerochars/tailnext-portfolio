@@ -4,7 +4,8 @@ import { latestBlogPosts } from "./blog-posts"
 export async function blogPostsResponse(fetcher: typeof fetch = fetch): Promise<Response> {
   try {
     const response = await fetcher(`${publicLinks.blog}/search.json`, {
-      next: { revalidate: 3600 },
+      // Cache only validated API responses, never an upstream error body with HTTP 200.
+      cache: "no-store",
       signal: AbortSignal.timeout(5000),
       headers: { Accept: "application/json" },
       redirect: "error",

@@ -44,7 +44,7 @@ export default function PawsphemySection({ locale, releases: releaseData = pawsp
         <label>{t.to}<input type="date" className={inputClass} value={to} onChange={e => { setTo(e.target.value); setPage(1) }} /></label>
       </div>
       <div aria-live="polite" className="space-y-4">{filtered.length ? releasePage(filtered, page).map(release => <Release key={`${release.date}-${release.name}`} release={release} locale={locale} />) : <p>{releases.length ? t.noResults : t.empty}</p>}</div>
-      {filtered.length > 10 && <div className="mt-6 flex items-center justify-between gap-4"><button type="button" disabled={page === 1} onClick={() => setPage(page - 1)} className="min-h-11 underline disabled:opacity-50">{t.previous}</button><span>{t.page} {page} / {pages}</span><button type="button" disabled={page === pages} onClick={() => setPage(page + 1)} className="min-h-11 underline disabled:opacity-50">{t.next}</button></div>}
+      {filtered.length > 10 && <div className="mt-6 flex items-center justify-between gap-4"><button type="button" aria-disabled={page === 1} onClick={() => { if (page > 1) setPage(page - 1) }} className="min-h-11 underline aria-disabled:opacity-50">{t.previous}</button><span>{t.page} {page} / {pages}</span><button type="button" aria-disabled={page === pages} onClick={() => { if (page < pages) setPage(page + 1) }} className="min-h-11 underline aria-disabled:opacity-50">{t.next}</button></div>}
     </dialog>
   </section>
 }

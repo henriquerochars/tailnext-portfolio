@@ -55,7 +55,7 @@ test("renders populated releases and resets archive pagination when filters chan
     await page.setContent('<div id="root"></div>')
     await page.addScriptTag({ path: path.join(output, "fixture.js") })
     const section = page.locator("#pawsphemy")
-    const preview = section.locator("article:not(dialog article)")
+    const preview = section.getByTestId("release-preview").locator("article")
     await expect(preview).toHaveCount(5)
     await expect(preview.first().getByRole("heading")).toHaveText("Release 12")
     await expect(preview.first().getByText("Full explanation 12")).toBeVisible()

@@ -6,9 +6,9 @@ import { filterReleases, releasePage } from "@/lib/pawsphemy-releases"
 import type { SiteLocale } from "@/i18n/locales"
 
 const copy = {
-  en: { title: "Pawsphemy patch notes", empty: "No releases published yet. Check back soon.", archive: "View release archive", close: "Close archive", search: "Search by name", from: "From date", to: "To date", noResults: "No releases match these filters.", previous: "Previous", next: "Next", page: "Page" },
-  "pt-BR": { title: "Notas de atualização do Pawsphemy", empty: "Ainda não há versões publicadas. Volte em breve.", archive: "Ver arquivo de versões", close: "Fechar arquivo", search: "Buscar por nome", from: "Data inicial", to: "Data final", noResults: "Nenhuma versão corresponde aos filtros.", previous: "Anterior", next: "Próxima", page: "Página" },
-  es: { title: "Notas de actualización de Pawsphemy", empty: "Todavía no hay versiones publicadas. Vuelve pronto.", archive: "Ver archivo de versiones", close: "Cerrar archivo", search: "Buscar por nombre", from: "Fecha inicial", to: "Fecha final", noResults: "Ninguna versión coincide con los filtros.", previous: "Anterior", next: "Siguiente", page: "Página" },
+  en: { title: "Pawsphemy patch notes", pending: "The official changelog also tracks unreleased work. See the source for the latest updates; gameplay GIFs are available separately. Access to the source repository is currently restricted.", source: "Official changelog", gallery: "Gameplay GIFs", empty: "No releases published yet. Check back soon.", archive: "View release archive", close: "Close archive", search: "Search by name", from: "From date", to: "To date", noResults: "No releases match these filters.", previous: "Previous", next: "Next", page: "Page" },
+  "pt-BR": { title: "Notas de atualização do Pawsphemy", pending: "O changelog oficial também registra alterações ainda não lançadas. Consulte a fonte para as atualizações mais recentes; os GIFs de gameplay estão disponíveis separadamente. O acesso ao repositório de origem está restrito no momento.", source: "Changelog oficial", gallery: "GIFs de gameplay", empty: "Ainda não há versões publicadas. Volte em breve.", archive: "Ver arquivo de versões", close: "Fechar arquivo", search: "Buscar por nome", from: "Data inicial", to: "Data final", noResults: "Nenhuma versão corresponde aos filtros.", previous: "Anterior", next: "Próxima", page: "Página" },
+  es: { title: "Notas de actualización de Pawsphemy", pending: "El changelog oficial también registra cambios aún no publicados. Consulta la fuente para las últimas novedades; los GIF de juego están disponibles por separado. El acceso al repositorio de origen está restringido actualmente.", source: "Changelog oficial", gallery: "GIF de juego", empty: "Todavía no hay versiones publicadas. Vuelve pronto.", archive: "Ver archivo de versiones", close: "Cerrar archivo", search: "Buscar por nombre", from: "Fecha inicial", to: "Fecha final", noResults: "Ninguna versión coincide con los filtros.", previous: "Anterior", next: "Siguiente", page: "Página" },
 }
 
 function Release({ release, locale }: { release: PawsphemyRelease; locale: SiteLocale }) {
@@ -36,6 +36,10 @@ export default function PawsphemySection({ locale, releases: releaseData = pawsp
   return <section id="pawsphemy" aria-labelledby="pawsphemy-heading" className="py-12 md:py-16">
     <h2 id="pawsphemy-heading" className="text-center text-3xl font-bold sm:text-4xl">{t.title}</h2>
     <hr className="mx-auto my-4 h-1 w-6 rounded border-0 bg-teal-500" />
+    <div className="mx-auto mb-6 max-w-3xl text-center leading-relaxed">
+      <p>{t.pending}</p>
+      <p className="mt-2"><a className="text-teal-700 underline dark:text-teal-400" href="https://github.com/henriquerochars/pawsphemy/blob/main/CHANGELOG.md">{t.source}</a>{" · "}<a className="text-teal-700 underline dark:text-teal-400" href="https://github.com/henriquerochars/pawsphemy/tree/main/docs/gifs">{t.gallery}</a></p>
+    </div>
     {releases.length ? <div className="space-y-4">{releases.slice(0, 5).map(release => <Release key={`${release.date}-${release.name}`} release={release} locale={locale} />)}</div> : <p className="py-6 text-center">{t.empty}</p>}
     <div className="mt-8 text-center"><button type="button" onClick={() => dialog.current?.showModal()} className="min-h-11 px-4 font-semibold text-teal-700 underline underline-offset-4 dark:text-teal-400">{t.archive}</button></div>
     <dialog ref={dialog} aria-labelledby="archive-heading" className="m-auto max-h-[90vh] w-[min(90vw,48rem)] rounded-xl bg-white p-6 text-neutral-900 shadow-xl backdrop:bg-black/60 dark:bg-stone-900 dark:text-white">

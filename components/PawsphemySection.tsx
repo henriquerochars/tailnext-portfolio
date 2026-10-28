@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react"
 import { pawsphemyReleases, type PawsphemyRelease } from "@/data/pawsphemy-releases"
+import { filterReleases, releasePage } from "@/lib/pawsphemy-releases"
 import type { SiteLocale } from "@/i18n/locales"
 
 const copy = {
@@ -26,8 +27,8 @@ export default function PawsphemySection({ locale }: { locale: SiteLocale }) {
   const [from, setFrom] = useState("")
   const [to, setTo] = useState("")
   const [page, setPage] = useState(1)
-  const releases = [...pawsphemyReleases].sort ( (a, b) => b.date.localeCompare(a.date))
-  const filtered = releases.filter(release => release.name.toLocaleLowerCase(locale).includes(search.trim().toLocaleLowerCase(locale)) && (!from || release.date >= from) && (!to || release.date <= to))
+  const releases = filterReleases(pawsphemyReleases, locale)
+  const filtered = filterReleases(releases, locale, search, from, to)
   const pages = Math.max(1, Math.ceil(filtered.length / 10))
   const inputClass = "block w-full rounded border border-neutral-400 bg-white p-2 text-neutral-900 dark:border-stone-600 dark:bg-stone-800 dark:text-white"
   return <section id="pawsphemy" aria-labelledby="pawsphemy-heading" className="py-12 md:py-16">
@@ -42,7 +43,7 @@ export default function PawsphemySection({ locale }: { locale: SiteLocale }) {
         <label>{t.from}<input type="date" className={inputClass} value={from} onChange={e => { setFrom(e.target.value); setPage(1) }} /></label>
         <label>{t.to}<input type="date" className={inputClass} value={to} onChange={e => { setTo(e.target.value); setPage(1) }} /></label>
       </div>
-      <div aria-live="polite" className="space-y-4">{filtered.length ? filtered.slice((page - 1) * 10, page * 10).map(release => <Release key={`${release.date}-${release.name}`} release={release} locale={locale} />) : <p>{releases.length ? t.noResults : t.empty}</p>}</div>
+      <div aria-live="polite" className="space-y-4">{filtered.length ? releasePage(filtered, page).map(release => <Release key={`${release.date}-${release.name}`} release={release} locale={locale} />) : <p>{releases.length ? t.noResults : t.empty}</p>}</div>
       {filtered.length > 10 && <div className="mt-6 flex items-center justify-between gap-4"><button type="button" disabled={page === 1} onClick={() => setPage(page - 1)} className="min-h-11 underline disabled:opacity-50">{t.previous}</button><span>{t.page} {page} / {pages}</span><button type="button" disabled={page === pages} onClick={() => setPage(page + 1)} className="min-h-11 underline disabled:opacity-50">{t.next}</button></div>}
     </dialog>
   </section>

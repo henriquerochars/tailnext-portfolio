@@ -2,12 +2,12 @@ import { publicLinks } from "./public-profile"
 
 export { profileIntroduction, publicLinks } from "./public-profile"
 
-export interface ContentSource {
-  url: string
-  inspectedOn: string
-}
+export type ContentSource =
+  | { kind: "linkedin-inspection"; url: string; inspectedOn: string }
+  | { kind: "owner-screenshot"; providedOn: string }
 
-export const profileSource: ContentSource = {
+export const profileSource: Extract<ContentSource, { kind: "linkedin-inspection" }> = {
+  kind: "linkedin-inspection",
   url: publicLinks.linkedin,
   inspectedOn: "2026-10-11",
 }
@@ -73,6 +73,8 @@ export const skills = {
   netilify: { label: "Netilify", sourceLabels: ["Netilify"] },
   pwa: { label: "PWA", sourceLabels: ["PWA"] },
   redis: { label: "Redis", sourceLabels: ["Redis"] },
+  "game-development": { label: "Game Development", sourceLabels: ["Game Development"] },
+  "game-design": { label: "Game Design", sourceLabels: ["Game Design"] },
   godot: { label: "Godot", sourceLabels: [] },
   gdscript: { label: "GDScript", sourceLabels: [] },
 } as const
@@ -217,6 +219,12 @@ export const employment: readonly Employment[] = [
 ]
 
 export const education: readonly Education[] = [
+  {
+    id: "cruzeiro-do-sul", institution: "Universidade Cruzeiro do Sul", program: "Postgraduate", field: "Game Design",
+    start: { year: 2026, month: 10 }, end: { year: 2027, month: 8 }, status: "in-progress",
+    source: { kind: "owner-screenshot", providedOn: "2026-10-28" },
+    skillAssociations: { status: "verified", skillIds: ["game-development", "game-design"], source: { kind: "owner-screenshot", providedOn: "2026-10-28" } },
+  },
   {
     id: "unipds", institution: "UNIPDS",
     program: "Postgraduate Program in Software Engineering for Applied AI", field: "Computer Science",

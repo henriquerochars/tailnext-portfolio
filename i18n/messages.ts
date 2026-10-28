@@ -71,8 +71,8 @@ const jobs: Record<"pt-BR" | "es", Record<string, JobTranslation>> = {
   },
 }
 const studies: Record<"pt-BR" | "es", Record<string, StudyTranslation>> = {
-  "pt-BR": { unipds: { program: "Pós-graduação em Engenharia de Software para IA Aplicada", field: "Ciência da Computação" }, estacio: { program: "Bacharelado", field: "Ciência da Computação" } },
-  es: { unipds: { program: "Posgrado en Ingeniería de Software para IA Aplicada", field: "Ciencias de la Computación" }, estacio: { program: "Grado universitario", field: "Ciencias de la Computación" } },
+  "pt-BR": { "cruzeiro-do-sul": { program: "Pós-graduação", field: "Game Design" }, unipds: { program: "Pós-graduação em Engenharia de Software para IA Aplicada", field: "Ciência da Computação" }, estacio: { program: "Bacharelado", field: "Ciência da Computação" } },
+  es: { "cruzeiro-do-sul": { program: "Posgrado", field: "Game Design" }, unipds: { program: "Posgrado en Ingeniería de Software para IA Aplicada", field: "Ciencias de la Computación" }, estacio: { program: "Grado universitario", field: "Ciencias de la Computación" } },
 }
 const translatedSkills: Record<"pt-BR" | "es", Partial<Record<SkillId, string>>> = {
   "pt-BR": { "harness-engineering": "Engenharia de Harness", "spec-driven-development": "Desenvolvimento de Software Orientado por Especificações", ai: "Inteligência Artificial (IA)", "ai-agents": "Agentes de IA", "unit-testing": "Testes Unitários", "api-development": "Desenvolvimento de API" },

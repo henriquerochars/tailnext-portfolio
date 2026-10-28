@@ -76,3 +76,7 @@ Hero: “I'm a Senior Software Engineer at Lena, based in Rio de Janeiro, Brazil
 About summarizes full-stack/mobile work across financial services, cybersecurity and healthcare; current care-coordination work, harness engineering and spec-driven development; and the ongoing UNIPDS program. It introduces no metrics, availability claim or inferred qualification.
 
 The selected 12 visible skills are TypeScript, JavaScript, React, Next.js, React Native, Node.js, NestJS, Python, AWS, Artificial Intelligence (AI), Harness Engineering and Spec-Driven Software Development. Godot and GDScript follow them as owner-added skills, for 14 visible skills in total. The full catalog and original Top Skills order remain available in the shared data. Owner review of this proposal must be recorded explicitly; implementation or passing tests do not imply editorial approval.
+
+## Owner-provided education update, 2026-10-28
+
+The owner supplied an Education screenshot showing Universidade Cruzeiro do Sul, Postgraduate in Game Design, October 2026 to August 2027, with Game Development and Game Design as associated skills. The portfolio marks the end date as expected. The screenshot is evidence for this entry only; it does not establish a complete new profile or global skills inventory.

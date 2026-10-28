@@ -6,7 +6,7 @@ export type ContentSource =
   | { kind: "linkedin-inspection"; url: string; inspectedOn: string }
   | { kind: "owner-screenshot"; providedOn: string }
 
-export const profileSource: ContentSource = {
+export const profileSource: Extract<ContentSource, { kind: "linkedin-inspection" }> = {
   kind: "linkedin-inspection",
   url: publicLinks.linkedin,
   inspectedOn: "2026-10-11",

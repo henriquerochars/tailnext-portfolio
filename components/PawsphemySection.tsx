@@ -16,6 +16,8 @@ function Release({ release, locale }: { release: PawsphemyRelease; locale: SiteL
     <time dateTime={release.date} className="text-sm text-neutral-600 dark:text-neutral-300">{new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${release.date}T00:00:00Z`))}</time>
     <h3 className="mt-2 text-xl font-semibold">{release.name}</h3>
     <p className="mt-3 whitespace-pre-wrap leading-relaxed">{release.explanation}</p>
+    {/* Render the original GIF directly to preserve animation. */}
+    {/* eslint-disable-next-line @next/next/no-img-element */}
     {release.gifs.map(gif => <img key={gif.src} src={gif.src} alt={gif.alt} loading="lazy" className="mt-4 h-auto max-w-full rounded" />)}
   </article>
 }

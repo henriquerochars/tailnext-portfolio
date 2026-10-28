@@ -46,7 +46,7 @@ export default function PawsphemySection({ locale, releases: releaseData = pawsp
       <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{pawsphemyUnreleased[locale].period}</p>
       <ul className="mt-4 list-disc space-y-2 pl-5">{pawsphemyUnreleased[locale].items.map(item => <li key={item}>{item}</li>)}</ul>
     </article>
-    {releases.length ? <div className="space-y-4">{releases.slice(0, 5).map(release => <Release key={`${release.date}-${release.name}`} release={release} locale={locale} />)}</div> : <p className="py-6 text-center">{t.empty}</p>}
+    {releases.length ? <div data-testid="release-preview" className="space-y-4">{releases.slice(0, 5).map(release => <Release key={`${release.date}-${release.name}`} release={release} locale={locale} />)}</div> : <p className="py-6 text-center">{t.empty}</p>}
     <div className="mt-8 text-center"><button type="button" onClick={() => dialog.current?.showModal()} className="min-h-11 px-4 font-semibold text-teal-700 underline underline-offset-4 dark:text-teal-400">{t.archive}</button></div>
     <dialog ref={dialog} aria-labelledby="archive-heading" className="m-auto max-h-[90vh] w-[min(90vw,48rem)] rounded-xl bg-white p-6 text-neutral-900 shadow-xl backdrop:bg-black/60 dark:bg-stone-900 dark:text-white">
       <div className="flex items-start justify-between gap-4"><h2 id="archive-heading" className="text-2xl font-bold">{t.archive}</h2><button type="button" onClick={() => dialog.current?.close()} className="min-h-11 underline">{t.close}</button></div>

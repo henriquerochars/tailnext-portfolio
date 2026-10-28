@@ -22,3 +22,5 @@ asset URL and descriptive alt text. Otherwise leave `gifs` empty. Check links an
 image accessibility, update the pending copy if its factual premise changes, and run
 the repository verification and relevant archive tests. This is a manual update; no
 upstream changes are imported automatically.
+
+The unreleased development summary in `data/pawsphemy-unreleased.ts` is a manually maintained editorial snapshot of the official changelog, pinned to the game commit recorded in that file. Refresh its three translations when the owner requests an update. Its date range comes from the changelog and is not a release date. Published releases continue to use the separate archive.

@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
+import { pawsphemyUnreleased } from "@/data/pawsphemy-unreleased"
 import { pawsphemyReleases, type PawsphemyRelease } from "@/data/pawsphemy-releases"
 import { filterReleases, releasePage } from "@/lib/pawsphemy-releases"
 import type { SiteLocale } from "@/i18n/locales"
@@ -40,6 +41,11 @@ export default function PawsphemySection({ locale, releases: releaseData = pawsp
       <p>{t.pending}</p>
       <p className="mt-2"><a className="text-teal-700 underline dark:text-teal-400" href="https://github.com/henriquerochars/pawsphemy/blob/main/CHANGELOG.md">{t.source}</a>{" · "}<a className="text-teal-700 underline dark:text-teal-400" href="https://github.com/henriquerochars/pawsphemy/tree/main/docs/gifs">{t.gallery}</a></p>
     </div>
+    <article className="mb-8 rounded-xl border border-neutral-200 bg-neutral-50 p-6 dark:border-stone-700 dark:bg-stone-800/50">
+      <h3 className="text-xl font-semibold">{pawsphemyUnreleased[locale].heading}</h3>
+      <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{pawsphemyUnreleased[locale].period}</p>
+      <ul className="mt-4 list-disc space-y-2 pl-5">{pawsphemyUnreleased[locale].items.map(item => <li key={item}>{item}</li>)}</ul>
+    </article>
     {releases.length ? <div className="space-y-4">{releases.slice(0, 5).map(release => <Release key={`${release.date}-${release.name}`} release={release} locale={locale} />)}</div> : <p className="py-6 text-center">{t.empty}</p>}
     <div className="mt-8 text-center"><button type="button" onClick={() => dialog.current?.showModal()} className="min-h-11 px-4 font-semibold text-teal-700 underline underline-offset-4 dark:text-teal-400">{t.archive}</button></div>
     <dialog ref={dialog} aria-labelledby="archive-heading" className="m-auto max-h-[90vh] w-[min(90vw,48rem)] rounded-xl bg-white p-6 text-neutral-900 shadow-xl backdrop:bg-black/60 dark:bg-stone-900 dark:text-white">

@@ -20,14 +20,14 @@ function Release({ release, locale }: { release: PawsphemyRelease; locale: SiteL
   </article>
 }
 
-export default function PawsphemySection({ locale }: { locale: SiteLocale }) {
+export default function PawsphemySection({ locale, releases: releaseData = pawsphemyReleases }: { locale: SiteLocale; releases?: PawsphemyRelease[] }) {
   const t = copy[locale]
   const dialog = useRef<HTMLDialogElement>(null)
   const [search, setSearch] = useState("")
   const [from, setFrom] = useState("")
   const [to, setTo] = useState("")
   const [page, setPage] = useState(1)
-  const releases = filterReleases(pawsphemyReleases, locale)
+  const releases = filterReleases(releaseData, locale)
   const filtered = filterReleases(releases, locale, search, from, to)
   const pages = Math.max(1, Math.ceil(filtered.length / 10))
   const inputClass = "block w-full rounded border border-neutral-400 bg-white p-2 text-neutral-900 dark:border-stone-600 dark:bg-stone-800 dark:text-white"

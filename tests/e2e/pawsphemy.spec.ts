@@ -32,3 +32,47 @@ test("orders and filters releases and limits archive pages", async () => {
   expect(sorted[0].explanation).toBe("Full explanation 12")
   expect(sorted[0].gifs[0].alt).toBe("Example 12")
 })
+
+test("renders populated releases and resets archive pagination when filters change", async ({ page }) => {
+  // Bundle the real component with test-only data; no fixture route or release is shipped.
+  const webpack = (await import("next/dist/compiled/webpack/webpack")).default
+  const path = await import("node:path")
+  const fs = await import("node:fs/promises")
+  const os = await import("node:os")
+  const output = await fs.mkdtemp(path.join(os.tmpdir(), "pawsphemy-ui-"))
+  try {
+    await new Promise<void>((resolve, reject) => {
+      webpack({ mode: "development", entry: path.resolve("tests/fixtures/pawsphemy/entry.tsx"), output: { path: output, filename: "fixture.js" }, resolve: { extensions: [".tsx", ".ts", ".js"], alias: { "@": process.cwd() } }, module: { rules: [{ test: /\.tsx?$/, exclude: /node_modules/, use: path.resolve("tests/fixtures/pawsphemy/loader.cjs") }] } }, (error, stats) => {
+        if (error || stats?.hasErrors()) reject(error ?? new Error(stats?.toString({ errors: true })))
+        else resolve()
+      })
+    })
+    await page.setContent('<div id="root"></div>')
+    await page.addScriptTag({ path: path.join(output, "fixture.js") })
+    const section = page.locator("#pawsphemy")
+    await expect(section.locator("article")).toHaveCount(5)
+    await expect(section.locator("article").first().getByRole("heading")).toHaveText("Release 12")
+    await expect(section.locator("article").first().getByText("Full explanation 12")).toBeVisible()
+    await expect(section.locator("article").first().getByRole("img", { name: "Example 12" })).toHaveAttribute("src", "/fixture-12.gif")
+    await section.getByRole("button", { name: "View release archive" }).click()
+    const dialog = page.getByRole("dialog")
+    await expect(dialog.locator("article")).toHaveCount(10)
+    await dialog.getByRole("button", { name: "Next" }).click()
+    await expect(dialog.getByText("Page 2 / 2")).toBeVisible()
+    await expect(dialog.locator("article")).toHaveCount(2)
+    await dialog.getByLabel("Search by name").fill(" RELEASE 1 ")
+    await expect(dialog.locator("article")).toHaveCount(4)
+    await expect(dialog.getByText("Full explanation 11")).toBeVisible()
+    await dialog.getByLabel("From date").fill("2025-01-10")
+    await dialog.getByLabel("To date").fill("2025-01-11")
+    await expect(dialog.locator("article")).toHaveCount(2)
+    await expect(dialog.locator("article").first().locator("time")).toHaveAttribute("datetime", "2025-01-11")
+    await dialog.getByLabel("Search by name").fill("missing")
+    await expect(dialog.getByText("No releases match these filters.")).toBeVisible()
+    await dialog.getByLabel("Search by name").fill("")
+    await dialog.getByLabel("From date").fill("")
+    await dialog.getByLabel("To date").fill("")
+    await expect(dialog.getByText("Page 1 / 2")).toBeVisible()
+    await expect(dialog.locator("article")).toHaveCount(10)
+  } finally { await fs.rm(output, { recursive: true, force: true }) }
+})

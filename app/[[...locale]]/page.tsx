@@ -4,6 +4,7 @@ import HeroSection from "@/components/HeroSection"
 import ExperienceSection from "@/components/ExperienceSection"
 import EducationSection from "@/components/EducationSection"
 import BlogSection from "@/components/BlogSection"
+import PawsphemySection from "@/components/PawsphemySection"
 import { getMessages } from "@/i18n/messages"
 import { routeLocale } from "@/i18n/locales"
 
@@ -26,6 +27,7 @@ export default async function Home({ params }: { params: Promise<{ locale?: stri
       <ExperienceSection messages={messages} locale={locale} />
       <EducationSection messages={messages} locale={locale} />
       <BlogSection key={locale} ui={messages.ui} locale={locale} />
+      <PawsphemySection key={locale} locale={locale} />
     </main>
   )
 }

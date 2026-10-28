@@ -50,10 +50,16 @@ test("renders the complete career and verified skills without inferring associat
   await expect(jobs.last()).toContainText("Technical Support")
   await expect(jobs.last()).toContainText("SQL, PowerShell and Python")
   await expect(page.locator("#experience-lendingclub").getByRole("listitem").filter({ hasText: /^GraphQL$/ })).toHaveCount(1)
-  await expect(studies.first()).toContainText("September 2026 — September 2027 (expected)")
-  await expect(studies.first()).toContainText("In progress")
-  await expect(studies.first().locator("time")).toHaveText(["September 2026", "September 2027"])
-  await expect(studies.first().locator("time").nth(1)).toHaveAttribute("datetime", "2027-09")
+  for (const [institution, dates, end] of [
+    ["Universidade Cruzeiro do Sul", ["October 2026", "August 2027"], "2027-08"],
+    ["UNIPDS", ["September 2026", "September 2027"], "2027-09"],
+  ] as const) {
+    const study = studies.filter({ hasText: institution })
+    await expect(study).toContainText(`${dates[0]} — ${dates[1]} (expected)`)
+    await expect(study).toContainText("In progress")
+    await expect(study.locator("time")).toHaveText([...dates])
+    await expect(study.locator("time").nth(1)).toHaveAttribute("datetime", end)
+  }
   await expect(studies.last().locator("time")).toHaveText(["2018", "2022"])
   await expect(studies.last().locator("time").first()).toHaveAttribute("datetime", "2018")
   await expect(studies.last()).not.toContainText("expected")

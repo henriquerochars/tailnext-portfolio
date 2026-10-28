@@ -56,18 +56,26 @@ test("retains source labels and verifies every skill relationship without infere
     expect(new Set(associations.skillIds).size).toBe(associations.skillIds.length)
     for (const id of associations.skillIds) expect(catalog.has(id)).toBe(true)
     for (const source of [entry.source, associations.source]) {
-      expect(new URL(source.url).origin).toBe("https://www.linkedin.com")
-      expect(source.inspectedOn).toBe(entry.id === "cruzeiro-do-sul" ? "2026-10-28" : profileSource.inspectedOn)
+      if (entry.id === "cruzeiro-do-sul") {
+        expect(source).toEqual({ kind: "owner-screenshot", providedOn: "2026-10-28" })
+      } else {
+        expect(source.kind).toBe("linkedin-inspection")
+        if (source.kind !== "linkedin-inspection") throw new Error("Expected LinkedIn inspection")
+        expect(new URL(source.url).origin).toBe("https://www.linkedin.com")
+        expect(source.inspectedOn).toBe("2026-10-11")
+      }
     }
     if (associations.status === "verified-empty") {
       expect(associations.skillIds).toEqual([])
       expect(associations.note).toContain("No association list")
     } else if (associations.status === "verified" && entry.id !== "cruzeiro-do-sul") {
       expect(associations.skillIds.length).toBeGreaterThan(0)
+      if (associations.source.kind !== "linkedin-inspection") throw new Error("Expected LinkedIn inspection")
       expect(associations.source.url).toContain("skill-associations-details/")
       expect(associations.source.url).toContain(`associationType=${"employer" in entry ? "position" : "education"}`)
     }
   }
+  if (globalSkillsSource.kind !== "linkedin-inspection") throw new Error("Expected LinkedIn inspection")
   expect(globalSkillsSource.url).toMatch(/\/details\/skills\/$/)
   // A described technology and an associated skill are different evidence.
   expect(employment[8].descriptionTechnologies).toContain("Python")

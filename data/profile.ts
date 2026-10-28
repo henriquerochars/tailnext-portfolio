@@ -2,12 +2,12 @@ import { publicLinks } from "./public-profile"
 
 export { profileIntroduction, publicLinks } from "./public-profile"
 
-export interface ContentSource {
-  url: string
-  inspectedOn: string
-}
+export type ContentSource =
+  | { kind: "linkedin-inspection"; url: string; inspectedOn: string }
+  | { kind: "owner-screenshot"; providedOn: string }
 
 export const profileSource: ContentSource = {
+  kind: "linkedin-inspection",
   url: publicLinks.linkedin,
   inspectedOn: "2026-10-11",
 }
@@ -222,8 +222,8 @@ export const education: readonly Education[] = [
   {
     id: "cruzeiro-do-sul", institution: "Universidade Cruzeiro do Sul", program: "Postgraduate", field: "Game Design",
     start: { year: 2026, month: 10 }, end: { year: 2027, month: 8 }, status: "in-progress",
-    source: { ...educationSource, inspectedOn: "2026-10-28" },
-    skillAssociations: { status: "verified", skillIds: ["game-development", "game-design"], source: { ...educationSource, inspectedOn: "2026-10-28" } },
+    source: { kind: "owner-screenshot", providedOn: "2026-10-28" },
+    skillAssociations: { status: "verified", skillIds: ["game-development", "game-design"], source: { kind: "owner-screenshot", providedOn: "2026-10-28" } },
   },
   {
     id: "unipds", institution: "UNIPDS",

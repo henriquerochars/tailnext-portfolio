@@ -3,7 +3,7 @@
 export const pawsphemyUnreleased = {
   en: {
     heading: "In development · not yet released",
-    period: "Recent updates: October 26–28, 2026",
+    period: "Changelog snapshot reviewed October 28, 2026 · Updates from October 26–28",
     items: [
       "Side-view traversal now includes jumping, the belfry route, portals and checkpoints.",
       "Caramelão and Pretin join the playable dogs. Running now has stamina, animations and a touch button.",
@@ -15,7 +15,7 @@ export const pawsphemyUnreleased = {
   },
   "pt-BR": {
     heading: "Em desenvolvimento · ainda não lançado",
-    period: "Atualizações recentes: 26 a 28 de outubro de 2026",
+    period: "Resumo do changelog revisado em 28 de outubro de 2026 · Atualizações de 26 a 28 de outubro",
     items: [
       "A exploração em visão lateral ganhou pulo, percurso no campanário, portais e pontos de controle.",
       "Caramelão e Pretin entraram para o elenco jogável. A corrida agora tem energia, animações e botão para toque.",
@@ -27,7 +27,7 @@ export const pawsphemyUnreleased = {
   },
   es: {
     heading: "En desarrollo · todavía sin publicar",
-    period: "Actualizaciones recientes: 26 al 28 de octubre de 2026",
+    period: "Resumen del changelog revisado el 28 de octubre de 2026 · Actualizaciones del 26 al 28 de octubre",
     items: [
       "La exploración lateral incorpora salto, recorrido por el campanario, portales y puntos de control.",
       "Caramelão y Pretin se unen a los perros jugables. La carrera incluye resistencia, animaciones y botón táctil.",

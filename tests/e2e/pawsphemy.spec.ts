@@ -35,7 +35,9 @@ test("orders and filters releases and limits archive pages", async () => {
 
 test("renders populated releases and resets archive pagination when filters change", async ({ page }) => {
   // Bundle the real component with test-only data; no fixture route or release is shipped.
-  const webpack = (await import("next/dist/compiled/webpack/webpack")).default
+  const { webpack } = (await import("next/dist/compiled/webpack/webpack.js")).default as unknown as {
+    webpack: (config: object, callback: (error?: Error | null, stats?: { hasErrors(): boolean; toString(options: { errors: boolean }): string }) => void) => void
+  }
   const path = await import("node:path")
   const fs = await import("node:fs/promises")
   const os = await import("node:os")
@@ -50,10 +52,11 @@ test("renders populated releases and resets archive pagination when filters chan
     await page.setContent('<div id="root"></div>')
     await page.addScriptTag({ path: path.join(output, "fixture.js") })
     const section = page.locator("#pawsphemy")
-    await expect(section.locator("article")).toHaveCount(5)
-    await expect(section.locator("article").first().getByRole("heading")).toHaveText("Release 12")
-    await expect(section.locator("article").first().getByText("Full explanation 12")).toBeVisible()
-    await expect(section.locator("article").first().getByRole("img", { name: "Example 12" })).toHaveAttribute("src", "/fixture-12.gif")
+    const preview = section.locator("article:not(dialog article)")
+    await expect(preview).toHaveCount(5)
+    await expect(preview.first().getByRole("heading")).toHaveText("Release 12")
+    await expect(preview.first().getByText("Full explanation 12")).toBeVisible()
+    await expect(preview.first().getByRole("img", { name: "Example 12" })).toHaveAttribute("src", "/fixture-12.gif")
     await section.getByRole("button", { name: "View release archive" }).click()
     const dialog = page.getByRole("dialog")
     await expect(dialog.locator("article")).toHaveCount(10)
